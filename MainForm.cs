@@ -24,30 +24,25 @@ namespace JewelryTool
         private List<Product> products = new List<Product>();
         private List<Order> orders = new List<Order>();
 
+        // 打印相关配置
+        private PageSettings printPageSettings = new PageSettings();
+
         public MainForm()
         {
             InitializeComponent();
             InitDataFolder();
             LoadAllData();
             BindControlEvents();
+            InitPrintDefaultSetting();
         }
 
         #region 初始化数据
-        /// <summary>
-        /// 创建数据文件夹，确保目录存在
-        /// </summary>
         private void InitDataFolder()
         {
             if (!Directory.Exists(DataFolder))
                 Directory.CreateDirectory(DataFolder);
         }
 
-        /// <summary>
-        /// 加载所有JSON数据
-        /// </summary>
-        /// <summary>
-        /// 加载所有JSON数据
-        /// </summary>
         private void LoadAllData()
         {
             // 加载客户列表
@@ -58,12 +53,11 @@ namespace JewelryTool
             }
             else
             {
-                // 初始化默认客户
                 customers = new List<Customer>
-        {
-            new Customer { Id = 1, Name = "零售客户" },
-            new Customer { Id = 2, Name = "合作门店" }
-        };
+                {
+                    new Customer { Id = 1, Name = "零售客户" },
+                    new Customer { Id = 2, Name = "合作门店" }
+                };
                 SaveCustomersToJson();
             }
 
@@ -75,17 +69,16 @@ namespace JewelryTool
             }
             else
             {
-                // 初始化默认品类
                 products = new List<Product>
-        {
-            new Product { Id = 1, Name = "黄金" },
-            new Product { Id = 2, Name = "18k" },
-            new Product { Id = 3, Name = "22k" },
-            new Product { Id = 4, Name = "pt900" },
-            new Product { Id = 5, Name = "pt950" },
-            new Product { Id = 6, Name = "pt990" },
-            new Product { Id = 7, Name = "pd990" }
-        };
+                {
+                    new Product { Id = 1, Name = "黄金" },
+                    new Product { Id = 2, Name = "18k" },
+                    new Product { Id = 3, Name = "22k" },
+                    new Product { Id = 4, Name = "pt900" },
+                    new Product { Id = 5, Name = "pt950" },
+                    new Product { Id = 6, Name = "pt990" },
+                    new Product { Id = 7, Name = "pd990" }
+                };
                 SaveProductsToJson();
             }
 
@@ -101,29 +94,30 @@ namespace JewelryTool
             }
 
             // 绑定下拉框数据
+            cbCustomer.DataSource = null;
             cbCustomer.DataSource = customers;
             cbCustomer.DisplayMember = "Name";
             cbCustomer.ValueMember = "Id";
 
-            // 【新增】开启客户搜索功能
-            cbCustomer.DropDownStyle = ComboBoxStyle.DropDown; // 允许输入文字
-            cbCustomer.AutoCompleteMode = AutoCompleteMode.SuggestAppend; // 既弹出提示列表，又自动补全
-            cbCustomer.AutoCompleteSource = AutoCompleteSource.ListItems; // 用已绑定的客户列表作为搜索数据源
+            // 客户搜索功能
+            cbCustomer.DropDownStyle = ComboBoxStyle.DropDown;
+            cbCustomer.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            cbCustomer.AutoCompleteSource = AutoCompleteSource.ListItems;
 
             // 绑定表格的品名下拉
+            colProduct.DataSource = null;
             colProduct.DataSource = products;
             colProduct.DisplayMember = "Name";
             colProduct.ValueMember = "Id";
 
-            // 初始化默认值
+            // 初始化默认值（日期精确到分钟）
             dtpDate.Value = DateTime.Now;
+            dtpDate.Format = DateTimePickerFormat.Custom;
+            dtpDate.CustomFormat = "yyyy-MM-dd HH:mm";
             if (cbType.Items.Count > 0)
                 cbType.SelectedIndex = 0;
         }
 
-        /// <summary>
-        /// 绑定所有控件的事件
-        /// </summary>
         private void BindControlEvents()
         {
             // 按钮事件
@@ -132,29 +126,49 @@ namespace JewelryTool
             btnSave.Click += BtnSave_Click;
             btnExportExcel.Click += BtnExportExcel_Click;
             btnPrint.Click += BtnPrint_Click;
+            btnPrintSetting.Click += BtnPrintSetting_Click;
             btnStats.Click += BtnStats_Click;
             btnAddCustomer.Click += BtnAddCustomer_Click;
             btnAddProduct.Click += BtnAddProduct_Click;
+            btnHistory.Click += BtnHistory_Click;
 
             // 表格事件
             dgvItems.CellEndEdit += DgvItems_CellEndEdit;
             dgvItems.RowsAdded += (s, e) => RefreshRowNumber();
+
+            // 界面缩放事件
+            cbZoom.SelectedIndexChanged += CbZoom_SelectedIndexChanged;
+        }
+
+        private void InitPrintDefaultSetting()
+        {
+            // 适配二分复写纸241mm×139.7mm
+            int paperWidth = (int)Math.Round(241 / 0.254);
+            int paperHeight = (int)Math.Round(139.7 / 0.254);
+
+            foreach (PaperSize paper in printPageSettings.PrinterSettings.PaperSizes)
+            {
+                if (paper.Width == paperWidth && paper.Height == paperHeight)
+                {
+                    printPageSettings.PaperSize = paper;
+                    break;
+                }
+            }
+
+            printPageSettings.Margins = new Margins(20, 20, 20, 20);
         }
         #endregion
-        #region JSON数据保存方法（带调试信息）
+
+        #region JSON数据保存方法
         private void SaveCustomersToJson()
         {
             try
             {
-                // 确保目录存在
                 if (!Directory.Exists(DataFolder))
                     Directory.CreateDirectory(DataFolder);
 
                 string json = JsonConvert.SerializeObject(customers, Newtonsoft.Json.Formatting.Indented);
                 File.WriteAllText(CustomersFile, json);
-
-                // 调试信息（可以删掉）
-                Console.WriteLine($"客户数据已保存到：{CustomersFile}");
             }
             catch (Exception ex)
             {
@@ -171,8 +185,6 @@ namespace JewelryTool
 
                 string json = JsonConvert.SerializeObject(products, Newtonsoft.Json.Formatting.Indented);
                 File.WriteAllText(ProductsFile, json);
-
-                Console.WriteLine($"品类数据已保存到：{ProductsFile}");
             }
             catch (Exception ex)
             {
@@ -180,7 +192,7 @@ namespace JewelryTool
             }
         }
 
-        private void SaveOrdersToJson()
+        public void SaveOrdersToJson()
         {
             try
             {
@@ -189,20 +201,20 @@ namespace JewelryTool
 
                 string json = JsonConvert.SerializeObject(orders, Newtonsoft.Json.Formatting.Indented);
                 File.WriteAllText(OrdersFile, json);
-
-                Console.WriteLine($"单据数据已保存到：{OrdersFile}");
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"保存单据数据失败：{ex.Message}\n路径：{OrdersFile}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        public void RefreshAllData()
+        {
+            LoadAllData();
+        }
         #endregion
 
         #region 界面操作方法
-        /// <summary>
-        /// 新增客户
-        /// </summary>
         private void BtnAddCustomer_Click(object sender, EventArgs e)
         {
             string custName = Interaction.InputBox("请输入客户名称：", "新增客户", "");
@@ -212,7 +224,6 @@ namespace JewelryTool
             customers.Add(new Customer { Id = newId, Name = custName });
             SaveCustomersToJson();
 
-            // 刷新下拉框
             cbCustomer.DataSource = null;
             cbCustomer.DataSource = customers;
             cbCustomer.DisplayMember = "Name";
@@ -221,9 +232,6 @@ namespace JewelryTool
             MessageBox.Show("客户新增成功！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        /// <summary>
-        /// 新增品类
-        /// </summary>
         private void BtnAddProduct_Click(object sender, EventArgs e)
         {
             string prodName = Interaction.InputBox("请输入品类名称：", "新增品类", "");
@@ -233,7 +241,6 @@ namespace JewelryTool
             products.Add(new Product { Id = newId, Name = prodName });
             SaveProductsToJson();
 
-            // 刷新表格下拉
             colProduct.DataSource = null;
             colProduct.DataSource = products;
             colProduct.DisplayMember = "Name";
@@ -242,20 +249,14 @@ namespace JewelryTool
             MessageBox.Show("品类新增成功！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        /// <summary>
-        /// 新增表格行
-        /// </summary>
         private void BtnAddRow_Click(object sender, EventArgs e)
         {
             int rowIndex = dgvItems.Rows.Add();
             var newRow = dgvItems.Rows[rowIndex];
-            newRow.Cells[colPurity.Name].Value = 1m; // 默认成色1
+            newRow.Cells[colPurity.Name].Value = 1m;
             RefreshRowNumber();
         }
 
-        /// <summary>
-        /// 删除选中行
-        /// </summary>
         private void BtnDeleteRow_Click(object sender, EventArgs e)
         {
             if (dgvItems.SelectedRows.Count == 0 || dgvItems.SelectedRows[0].IsNewRow)
@@ -269,9 +270,6 @@ namespace JewelryTool
             UpdateTotalPrice();
         }
 
-        /// <summary>
-        /// 刷新序号列
-        /// </summary>
         private void RefreshRowNumber()
         {
             for (int i = 0; i < dgvItems.Rows.Count; i++)
@@ -279,24 +277,42 @@ namespace JewelryTool
                 dgvItems.Rows[i].Cells[colIndex.Name].Value = i + 1;
             }
         }
+
+        private void CbZoom_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cbZoom.SelectedItem == null) return;
+
+            string zoomText = cbZoom.SelectedItem.ToString().Replace("%", "");
+            if (decimal.TryParse(zoomText, out decimal zoomRate))
+            {
+                float scale = (float)(zoomRate / 100m);
+                this.AutoScaleMode = AutoScaleMode.Font;
+                this.Scale(new SizeF(scale, scale));
+            }
+        }
+
+        private void BtnHistory_Click(object sender, EventArgs e)
+        {
+            using (HistoryForm historyForm = new HistoryForm(this))
+            {
+                historyForm.ShowDialog();
+                LoadAllData();
+            }
+        }
         #endregion
 
         #region 自动计算逻辑
-        /// <summary>
-        /// 单元格编辑后自动计算
-        /// </summary>
         private void DgvItems_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0) return;
             var currentRow = dgvItems.Rows[e.RowIndex];
 
-            // 1. 计算成色折价 = 成色 * 单价（不四舍五入，直接保留1位小数）
+            // 1. 计算成色折价 = 成色 * 单价（截断1位小数）
             decimal purity = 0, unitPrice = 0;
             if (decimal.TryParse(currentRow.Cells[colPurity.Name].Value?.ToString(), out purity)
                 && decimal.TryParse(currentRow.Cells[colUnitPrice.Name].Value?.ToString(), out unitPrice))
             {
                 decimal discountPrice = purity * unitPrice;
-                // 按需求：不四舍五入，直接截断小数
                 currentRow.Cells[colDiscountedPrice.Name].Value = Math.Truncate(discountPrice * 10) / 10;
             }
 
@@ -312,10 +328,7 @@ namespace JewelryTool
             UpdateTotalPrice();
         }
 
-        /// <summary>
-        /// 更新单据总价
-        /// </summary>
-        private void UpdateTotalPrice()
+        public void UpdateTotalPrice()
         {
             decimal total = 0;
             foreach (DataGridViewRow row in dgvItems.Rows)
@@ -330,12 +343,6 @@ namespace JewelryTool
         #endregion
 
         #region 核心功能按钮
-        /// <summary>
-        /// 保存单据到JSON
-        /// </summary>
-        /// <summary>
-        /// 保存单据到JSON（带详细提示）
-        /// </summary>
         private void BtnSave_Click(object sender, EventArgs e)
         {
             if (dgvItems.Rows.Count == 0)
@@ -356,7 +363,6 @@ namespace JewelryTool
                 decimal grandTotal = 0;
                 decimal.TryParse(lblTotal.Text.Replace("单据总价：", "").Replace("元", "").Trim(), out grandTotal);
 
-                // 生成新单据
                 int newOrderId = orders.Count > 0 ? orders.Max(o => o.Id) + 1 : 1;
                 Order newOrder = new Order
                 {
@@ -370,10 +376,9 @@ namespace JewelryTool
                     Items = new List<OrderItem>()
                 };
 
-                // 填充明细
                 foreach (DataGridViewRow row in dgvItems.Rows)
                 {
-                    var product = products.FirstOrDefault(p => p.Id == Convert.ToInt32(row.Cells[colProduct.Name].Value));
+                    var product = products.FirstOrDefault(p => p.Id == Convert.ToInt32(row.Cells[colProduct.Name].Value ?? 0));
                     newOrder.Items.Add(new OrderItem
                     {
                         Id = newOrder.Items.Count + 1,
@@ -388,18 +393,15 @@ namespace JewelryTool
                     });
                 }
 
-                // 保存到JSON
                 orders.Add(newOrder);
                 SaveOrdersToJson();
 
-                // 成功提示，包含文件路径
                 MessageBox.Show(
                     $"单据保存成功！\n单据号：{newOrderId}\n\n数据文件保存在：\n{DataFolder}",
                     "成功",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
 
-                // 清空界面，方便下一次录入
                 dgvItems.Rows.Clear();
                 txtRemarks.Clear();
                 UpdateTotalPrice();
@@ -410,12 +412,6 @@ namespace JewelryTool
             }
         }
 
-        /// <summary>
-        /// 导出Excel
-        /// </summary>
-        /// <summary>
-        /// 导出Excel（已修复品名列显示数字的问题）
-        /// </summary>
         private void BtnExportExcel_Click(object sender, EventArgs e)
         {
             using (SaveFileDialog sfd = new SaveFileDialog())
@@ -430,22 +426,19 @@ namespace JewelryTool
                     {
                         var sheet = package.Workbook.Worksheets.Add("兑料单");
 
-                        // 标题
                         sheet.Cells["A1"].Value = "瑞华珠宝兑料单";
                         sheet.Cells["A1:H1"].Merge = true;
                         sheet.Cells["A1"].Style.Font.Size = 16;
                         sheet.Cells["A1"].Style.Font.Bold = true;
                         sheet.Cells["A1"].Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
 
-                        // 单据头
                         sheet.Cells["A3"].Value = "客户：";
                         sheet.Cells["B3"].Value = (cbCustomer.SelectedItem as Customer)?.Name;
                         sheet.Cells["D3"].Value = "日期：";
-                        sheet.Cells["E3"].Value = dtpDate.Value.ToString("yyyy-MM-dd");
+                        sheet.Cells["E3"].Value = dtpDate.Value.ToString("yyyy-MM-dd HH:mm");
                         sheet.Cells["G3"].Value = "单据类型：";
                         sheet.Cells["H3"].Value = cbType.SelectedItem.ToString();
 
-                        // 表格表头
                         string[] headers = { "序号", "品名", "毛重量", "净重量", "成色", "单价", "成色折价", "单项总价" };
                         for (int i = 0; i < headers.Length; i++)
                         {
@@ -453,12 +446,10 @@ namespace JewelryTool
                             sheet.Cells[5, i + 1].Style.Font.Bold = true;
                         }
 
-                        // 填充明细（已修复品名列）
                         for (int row = 0; row < dgvItems.Rows.Count; row++)
                         {
                             for (int col = 0; col < dgvItems.Columns.Count; col++)
                             {
-                                // 特殊处理品名列（第2列，索引1）：根据ID查品名
                                 if (col == 1)
                                 {
                                     var cellValue = dgvItems.Rows[row].Cells[col].Value;
@@ -474,27 +465,21 @@ namespace JewelryTool
                                 }
                                 else
                                 {
-                                    // 其他列正常导出
                                     sheet.Cells[row + 6, col + 1].Value = dgvItems.Rows[row].Cells[col].Value;
                                 }
                             }
                         }
 
-                        // 总价
                         int totalRow = dgvItems.Rows.Count + 7;
                         sheet.Cells[totalRow, 1].Value = "单据总价：";
                         sheet.Cells[totalRow, 2].Value = lblTotal.Text;
                         sheet.Cells[totalRow, 2].Style.Font.Bold = true;
                         sheet.Cells[totalRow, 2].Style.Font.Color.SetColor(Color.DarkRed);
 
-                        // 备注
                         sheet.Cells[totalRow + 1, 1].Value = "备注：";
                         sheet.Cells[totalRow + 1, 2].Value = txtRemarks.Text;
 
-                        // 自动适配列宽
                         sheet.Cells.AutoFitColumns();
-
-                        // 保存文件
                         package.SaveAs(new FileInfo(sfd.FileName));
                     }
                     MessageBox.Show("Excel导出成功！", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -506,12 +491,25 @@ namespace JewelryTool
             }
         }
 
-        /// <summary>
-        /// 打印功能（适配针式打印机）
-        /// </summary>
+        #region 打印相关功能
+        private void BtnPrintSetting_Click(object sender, EventArgs e)
+        {
+            using (PageSetupDialog pageSetupDialog = new PageSetupDialog())
+            {
+                pageSetupDialog.PageSettings = printPageSettings;
+                pageSetupDialog.AllowPrinter = true;
+                if (pageSetupDialog.ShowDialog() == DialogResult.OK)
+                {
+                    printPageSettings = pageSetupDialog.PageSettings;
+                    MessageBox.Show("打印纸张设置已保存！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+        }
+
         private void BtnPrint_Click(object sender, EventArgs e)
         {
             PrintDocument printDoc = new PrintDocument();
+            printDoc.DefaultPageSettings = printPageSettings;
             printDoc.PrintPage += PrintDoc_PrintPage;
 
             PrintPreviewDialog preview = new PrintPreviewDialog();
@@ -520,35 +518,46 @@ namespace JewelryTool
             preview.ShowDialog();
         }
 
-        /// <summary>
-        /// 打印内容绘制
-        /// </summary>
-        private void PrintDoc_PrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e)
+        private void PrintDoc_PrintPage(object sender, PrintPageEventArgs e)
         {
             Graphics g = e.Graphics;
-            Font titleFont = new Font("微软雅黑", 16, FontStyle.Bold);
-            Font headFont = new Font("微软雅黑", 10);
-            Font tableFont = new Font("微软雅黑", 9);
-            Font totalFont = new Font("微软雅黑", 12, FontStyle.Bold);
+            Rectangle printArea = e.MarginBounds;
+            int startX = printArea.Left;
+            int startY = printArea.Top;
+            int usableWidth = printArea.Width;
+
+            Font titleFont = new Font("微软雅黑", 12, FontStyle.Bold);
+            Font headFont = new Font("微软雅黑", 9);
+            Font tableFont = new Font("微软雅黑", 8);
+            Font totalFont = new Font("微软雅黑", 10, FontStyle.Bold);
+            Font remarkFont = new Font("微软雅黑", 7);
             Brush blackBrush = Brushes.Black;
 
-            int startX = 50;
-            int startY = 50;
-            int lineHeight = 25;
+            int lineHeight = 20;
 
-            // 标题
-            g.DrawString("瑞华珠宝兑料单", titleFont, blackBrush, startX + 300, startY);
-            startY += 40;
+            g.DrawString("瑞华珠宝兑料单", titleFont, blackBrush, startX + usableWidth / 2 - 80, startY);
+            startY += 30;
 
-            // 单据头
-            g.DrawString($"客户：{(cbCustomer.SelectedItem as Customer)?.Name}", headFont, blackBrush, startX, startY);
-            g.DrawString($"日期：{dtpDate.Value:yyyy-MM-dd}", headFont, blackBrush, startX + 300, startY);
-            g.DrawString($"单据类型：{cbType.SelectedItem.ToString()}", headFont, blackBrush, startX + 600, startY);
+            string custText = $"客户：{(cbCustomer.SelectedItem as Customer)?.Name}";
+            string dateText = $"日期：{dtpDate.Value:yyyy-MM-dd HH:mm}";
+            string typeText = $"单据类型：{cbType.SelectedItem?.ToString()}";
+
+            g.DrawString(custText, headFont, blackBrush, startX, startY);
+            g.DrawString(dateText, headFont, blackBrush, startX + usableWidth / 3, startY);
+            g.DrawString(typeText, headFont, blackBrush, startX + usableWidth * 2 / 3, startY);
             startY += lineHeight * 2;
 
-            // 表格表头
-            string[] tableHeaders = { "序号", "品名", "毛重量", "净重量", "成色", "单价", "成色折价", "单项总价" };
-            int[] colWidths = { 60, 100, 90, 90, 70, 90, 100, 120 };
+            string[] tableHeaders = { "序号", "品名", "毛重", "净重", "成色", "单价", "折价", "总价" };
+            int[] colWidths = new int[8];
+            colWidths[0] = (int)(usableWidth * 0.07);
+            colWidths[1] = (int)(usableWidth * 0.15);
+            colWidths[2] = (int)(usableWidth * 0.10);
+            colWidths[3] = (int)(usableWidth * 0.10);
+            colWidths[4] = (int)(usableWidth * 0.08);
+            colWidths[5] = (int)(usableWidth * 0.10);
+            colWidths[6] = (int)(usableWidth * 0.12);
+            colWidths[7] = (int)(usableWidth * 0.18);
+
             int currentX = startX;
             for (int i = 0; i < tableHeaders.Length; i++)
             {
@@ -556,9 +565,8 @@ namespace JewelryTool
                 currentX += colWidths[i];
             }
             startY += lineHeight;
-            g.DrawLine(Pens.Black, startX, startY - 5, startX + colWidths.Sum(), startY - 5);
+            g.DrawLine(Pens.Black, startX, startY - 5, startX + usableWidth, startY - 5);
 
-            // 表格明细
             foreach (DataGridViewRow row in dgvItems.Rows)
             {
                 currentX = startX;
@@ -569,32 +577,23 @@ namespace JewelryTool
                     currentX += colWidths[i];
                 }
                 startY += lineHeight;
+                if (startY > printArea.Bottom - 80) break;
             }
 
-            // 分隔线
-            g.DrawLine(Pens.Black, startX, startY, startX + colWidths.Sum(), startY);
+            g.DrawLine(Pens.Black, startX, startY, startX + usableWidth, startY);
             startY += lineHeight;
-
-            // 总价
             g.DrawString(lblTotal.Text, totalFont, Brushes.DarkRed, startX, startY);
             startY += lineHeight * 2;
 
-            // 备注
             g.DrawString($"备注：{txtRemarks.Text}", headFont, blackBrush, startX, startY);
-
-            // 底部备注说明
             startY += lineHeight * 2;
-            g.DrawString("备注：1.货品重量和货款已核对无误，如有错账年内可核查，过期无效。", tableFont, blackBrush, startX, startY);
-            startY += lineHeight;
-            g.DrawString("2.买方承诺以上物料是合法所有，不是赃物或违法所得，如属赃物或违法所得，卖方完全承担经济和法律责任。", tableFont, blackBrush, startX, startY);
-        }
 
-        /// <summary>
-        /// 统计中心（后续完善）
-        /// </summary>
-        /// <summary>
-        /// 统计中心（已完善）
-        /// </summary>
+            g.DrawString("备注：1.货品重量和货款已核对无误，如有错账年内可核查，过期无效。", remarkFont, blackBrush, startX, startY);
+            startY += 15;
+            g.DrawString("2.买方承诺以上物料是合法所有，不是赃物或违法所得，如属赃物或违法所得，卖方完全承担经济和法律责任。", remarkFont, blackBrush, startX, startY);
+        }
+        #endregion
+
         private void BtnStats_Click(object sender, EventArgs e)
         {
             using (StatsForm statsForm = new StatsForm())
@@ -602,31 +601,49 @@ namespace JewelryTool
                 statsForm.ShowDialog();
             }
         }
+
+        public void LoadOrderToMainForm(Order order)
+        {
+            if (order == null) return;
+
+            cbCustomer.SelectedValue = order.CustomerId;
+            dtpDate.Value = order.OrderDate;
+            cbType.SelectedItem = order.OrderType;
+            txtRemarks.Text = order.Remarks;
+
+            dgvItems.Rows.Clear();
+            foreach (var item in order.Items)
+            {
+                int rowIndex = dgvItems.Rows.Add();
+                var row = dgvItems.Rows[rowIndex];
+                row.Cells[colIndex.Name].Value = item.Id;
+                row.Cells[colProduct.Name].Value = item.ProductId;
+                row.Cells[colGrossWeight.Name].Value = item.GrossWeight;
+                row.Cells[colNetWeight.Name].Value = item.NetWeight;
+                row.Cells[colPurity.Name].Value = item.Purity;
+                row.Cells[colUnitPrice.Name].Value = item.UnitPrice;
+                row.Cells[colDiscountedPrice.Name].Value = item.DiscountedPrice;
+                row.Cells[colTotalPrice.Name].Value = item.TotalPrice;
+            }
+
+            UpdateTotalPrice();
+        }
         #endregion
     }
 
-    #region 数据模型（全部写在这里，不会重复）
-    /// <summary>
-    /// 客户模型
-    /// </summary>
+    #region 数据模型
     public class Customer
     {
         public int Id { get; set; }
         public string Name { get; set; }
     }
 
-    /// <summary>
-    /// 品类模型
-    /// </summary>
     public class Product
     {
         public int Id { get; set; }
         public string Name { get; set; }
     }
 
-    /// <summary>
-    /// 单据主表模型
-    /// </summary>
     public class Order
     {
         public int Id { get; set; }
@@ -639,9 +656,6 @@ namespace JewelryTool
         public List<OrderItem> Items { get; set; }
     }
 
-    /// <summary>
-    /// 单据明细模型
-    /// </summary>
     public class OrderItem
     {
         public int Id { get; set; }

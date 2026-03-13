@@ -119,5 +119,82 @@
         "TotalPrice": 16.0
       }
     ]
+  },
+  {
+    "Id": 6,
+    "CustomerId": 1,
+    "CustomerName": "零售客户",
+    "OrderDate": "2026-03-15T11:46:06",
+    "OrderType": "入库",
+    "GrandTotal": 4.00,
+    "Remarks": "",
+    "Items": [
+      {
+        "Id": 1,
+        "ProductId": 4,
+        "ProductName": "pt900",
+        "GrossWeight": 2.0,
+        "NetWeight": 2.0,
+        "Purity": 1.0,
+        "UnitPrice": 2.0,
+        "DiscountedPrice": 2.0,
+        "TotalPrice": 4.0
+      }
+    ]
+  },
+  {
+    "Id": 7,
+    "CustomerId": 1,
+    "CustomerName": "零售客户",
+    "OrderDate": "2026-03-13T11:52:18.9113356+08:00",
+    "OrderType": "入库",
+    "GrandTotal": 9.00,
+    "Remarks": "发一套一套沸腾鱼非常",
+    "Items": [
+      {
+        "Id": 1,
+        "ProductId": 5,
+        "ProductName": "pt950",
+        "GrossWeight": 3.0,
+        "NetWeight": 3.0,
+        "Purity": 1.0,
+        "UnitPrice": 3.0,
+        "DiscountedPrice": 3.0,
+        "TotalPrice": 9.0
+      }
+    ]
+  },
+  {
+    "Id": 8,
+    "CustomerId": 5,
+    "CustomerName": "啊哈哈哈",
+    "OrderDate": "2026-03-13T11:55:16.9699604+08:00",
+    "OrderType": "入库",
+    "GrandTotal": 1.00,
+    "Remarks": "",
+    "Items": [
+      {
+        "Id": 1,
+        "ProductId": 10,
+        "ProductName": "一个关于",
+        "GrossWeight": 1.0,
+        "NetWeight": 1.0,
+        "Purity": 1.0,
+        "UnitPrice": 1.0,
+        "DiscountedPrice": 1.0,
+        "TotalPrice": 1.0
+      },
+      {
+        "Id": 2,
+        "ProductId": 0,
+        "ProductName": "",
+        "GrossWeight": 0.0,
+        "NetWeight": 0.0,
+        "Purity": 1.0,
+        "UnitPrice": 0.0,
+        "DiscountedPrice": 0.0,
+        "TotalPrice": 0.0
+      }
+    ]
   }
 ]
