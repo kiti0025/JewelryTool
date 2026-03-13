@@ -491,106 +491,196 @@ namespace JewelryTool
             }
         }
 
-        #region 打印相关功能
+        #region 打印相关功能（修复版：彻底解决闪退，优化显示）
         private void BtnPrintSetting_Click(object sender, EventArgs e)
         {
-            using (PageSetupDialog pageSetupDialog = new PageSetupDialog())
+            try
             {
-                pageSetupDialog.PageSettings = printPageSettings;
-                pageSetupDialog.AllowPrinter = true;
-                if (pageSetupDialog.ShowDialog() == DialogResult.OK)
+                using (PageSetupDialog pageSetupDialog = new PageSetupDialog())
                 {
-                    printPageSettings = pageSetupDialog.PageSettings;
-                    MessageBox.Show("打印纸张设置已保存！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    pageSetupDialog.PageSettings = printPageSettings;
+                    pageSetupDialog.AllowPrinter = true;
+                    if (pageSetupDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        printPageSettings = pageSetupDialog.PageSettings;
+                        MessageBox.Show("打印纸张设置已保存！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"打印设置失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void BtnPrint_Click(object sender, EventArgs e)
         {
-            PrintDocument printDoc = new PrintDocument();
-            printDoc.DefaultPageSettings = printPageSettings;
-            printDoc.PrintPage += PrintDoc_PrintPage;
+            try
+            {
+                // 【修复1】打印前先检查必填数据
+                if (dgvItems.Rows.Count == 0)
+                {
+                    MessageBox.Show("没有可打印的明细数据，请先添加货品！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+                if (cbCustomer.SelectedItem == null)
+                {
+                    MessageBox.Show("请先选择客户！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
 
-            PrintPreviewDialog preview = new PrintPreviewDialog();
-            preview.Document = printDoc;
-            preview.WindowState = FormWindowState.Maximized;
-            preview.ShowDialog();
+                // 初始化打印文档
+                PrintDocument printDoc = new PrintDocument();
+                printDoc.DefaultPageSettings = printPageSettings;
+                printDoc.PrintPage += PrintDoc_PrintPage;
+                printDoc.BeginPrint += PrintDoc_BeginPrint;
+
+                // 先弹出预览，方便测试
+                PrintPreviewDialog preview = new PrintPreviewDialog();
+                preview.Document = printDoc;
+                preview.WindowState = FormWindowState.Maximized;
+                preview.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"启动打印失败：{ex.Message}\n\n详细信息：{ex.StackTrace}", "打印错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
+        // 打印开始前的初始化
+        private int _printCurrentRowIndex = 0;
+        private void PrintDoc_BeginPrint(object sender, PrintEventArgs e)
+        {
+            // 重置打印行索引，支持多次打印
+            _printCurrentRowIndex = 0;
+        }
+
+        // 【核心修复】打印内容绘制，加了异常捕获、资源释放、品名列修复
         private void PrintDoc_PrintPage(object sender, PrintPageEventArgs e)
         {
-            Graphics g = e.Graphics;
-            Rectangle printArea = e.MarginBounds;
-            int startX = printArea.Left;
-            int startY = printArea.Top;
-            int usableWidth = printArea.Width;
-
-            Font titleFont = new Font("微软雅黑", 12, FontStyle.Bold);
-            Font headFont = new Font("微软雅黑", 9);
-            Font tableFont = new Font("微软雅黑", 8);
-            Font totalFont = new Font("微软雅黑", 10, FontStyle.Bold);
-            Font remarkFont = new Font("微软雅黑", 7);
-            Brush blackBrush = Brushes.Black;
-
-            int lineHeight = 20;
-
-            g.DrawString("瑞华珠宝兑料单", titleFont, blackBrush, startX + usableWidth / 2 - 80, startY);
-            startY += 30;
-
-            string custText = $"客户：{(cbCustomer.SelectedItem as Customer)?.Name}";
-            string dateText = $"日期：{dtpDate.Value:yyyy-MM-dd HH:mm}";
-            string typeText = $"单据类型：{cbType.SelectedItem?.ToString()}";
-
-            g.DrawString(custText, headFont, blackBrush, startX, startY);
-            g.DrawString(dateText, headFont, blackBrush, startX + usableWidth / 3, startY);
-            g.DrawString(typeText, headFont, blackBrush, startX + usableWidth * 2 / 3, startY);
-            startY += lineHeight * 2;
-
-            string[] tableHeaders = { "序号", "品名", "毛重", "净重", "成色", "单价", "折价", "总价" };
-            int[] colWidths = new int[8];
-            colWidths[0] = (int)(usableWidth * 0.07);
-            colWidths[1] = (int)(usableWidth * 0.15);
-            colWidths[2] = (int)(usableWidth * 0.10);
-            colWidths[3] = (int)(usableWidth * 0.10);
-            colWidths[4] = (int)(usableWidth * 0.08);
-            colWidths[5] = (int)(usableWidth * 0.10);
-            colWidths[6] = (int)(usableWidth * 0.12);
-            colWidths[7] = (int)(usableWidth * 0.18);
-
-            int currentX = startX;
-            for (int i = 0; i < tableHeaders.Length; i++)
+            // 【修复2】全流程加异常捕获，绝对不会闪退
+            try
             {
-                g.DrawString(tableHeaders[i], headFont, blackBrush, currentX, startY);
-                currentX += colWidths[i];
-            }
-            startY += lineHeight;
-            g.DrawLine(Pens.Black, startX, startY - 5, startX + usableWidth, startY - 5);
+                Graphics g = e.Graphics;
+                Rectangle printArea = e.MarginBounds;
+                int startX = printArea.Left;
+                int startY = printArea.Top;
+                int usableWidth = printArea.Width;
 
-            foreach (DataGridViewRow row in dgvItems.Rows)
-            {
-                currentX = startX;
-                for (int i = 0; i < dgvItems.Columns.Count; i++)
+                // 定义字体，用完后释放
+                Font titleFont = new Font("微软雅黑", 12, FontStyle.Bold);
+                Font headFont = new Font("微软雅黑", 9);
+                Font tableFont = new Font("微软雅黑", 8);
+                Font totalFont = new Font("微软雅黑", 10, FontStyle.Bold);
+                Font remarkFont = new Font("微软雅黑", 7);
+                Brush blackBrush = Brushes.Black;
+                Pen blackPen = Pens.Black;
+
+                int lineHeight = 20;
+
+                // 1. 打印标题
+                g.DrawString("瑞华珠宝兑料单", titleFont, blackBrush, startX + usableWidth / 2 - 80, startY);
+                startY += 30;
+
+                // 2. 打印单据基础信息（加空值防护）
+                string custName = (cbCustomer.SelectedItem as Customer)?.Name ?? "未知客户";
+                string custText = $"客户：{custName}";
+                string dateText = $"日期：{dtpDate.Value:yyyy-MM-dd HH:mm}";
+                string typeText = $"单据类型：{cbType.SelectedItem?.ToString() ?? "入库"}";
+
+                g.DrawString(custText, headFont, blackBrush, startX, startY);
+                g.DrawString(dateText, headFont, blackBrush, startX + usableWidth / 3, startY);
+                g.DrawString(typeText, headFont, blackBrush, startX + usableWidth * 2 / 3, startY);
+                startY += lineHeight * 2;
+
+                // 3. 打印明细表头
+                string[] tableHeaders = { "序号", "品名", "毛重", "净重", "成色", "单价", "折价", "总价" };
+                int[] colWidths = new int[8];
+                colWidths[0] = (int)(usableWidth * 0.07);
+                colWidths[1] = (int)(usableWidth * 0.15);
+                colWidths[2] = (int)(usableWidth * 0.10);
+                colWidths[3] = (int)(usableWidth * 0.10);
+                colWidths[4] = (int)(usableWidth * 0.08);
+                colWidths[5] = (int)(usableWidth * 0.10);
+                colWidths[6] = (int)(usableWidth * 0.12);
+                colWidths[7] = (int)(usableWidth * 0.18);
+
+                int currentX = startX;
+                for (int i = 0; i < tableHeaders.Length; i++)
                 {
-                    object cellValue = row.Cells[i].Value;
-                    g.DrawString(cellValue?.ToString() ?? "", tableFont, blackBrush, currentX, startY);
+                    g.DrawString(tableHeaders[i], headFont, blackBrush, currentX, startY);
                     currentX += colWidths[i];
                 }
                 startY += lineHeight;
-                if (startY > printArea.Bottom - 80) break;
+                g.DrawLine(blackPen, startX, startY - 5, startX + usableWidth, startY - 5);
+
+                // 4. 【修复3】打印明细行（品名列显示名称而不是ID，支持分页）
+                int rowCount = dgvItems.Rows.Count;
+                while (_printCurrentRowIndex < rowCount && (startY + lineHeight) < printArea.Bottom - 100)
+                {
+                    DataGridViewRow row = dgvItems.Rows[_printCurrentRowIndex];
+                    currentX = startX;
+
+                    for (int i = 0; i < dgvItems.Columns.Count; i++)
+                    {
+                        string cellText = "";
+
+                        // 品名列特殊处理：把ID转换成产品名称
+                        if (i == 1)
+                        {
+                            object cellValue = row.Cells[i].Value;
+                            if (cellValue != null && int.TryParse(cellValue.ToString(), out int productId))
+                            {
+                                var product = products.FirstOrDefault(p => p.Id == productId);
+                                cellText = product?.Name ?? "";
+                            }
+                        }
+                        else
+                        {
+                            // 其他列直接显示
+                            object cellValue = row.Cells[i].Value;
+                            cellText = cellValue?.ToString() ?? "";
+                        }
+
+                        g.DrawString(cellText, tableFont, blackBrush, currentX, startY);
+                        currentX += colWidths[i];
+                    }
+
+                    startY += lineHeight;
+                    _printCurrentRowIndex++;
+                }
+
+                // 5. 打印底部合计和备注（只有最后一页才显示）
+                if (_printCurrentRowIndex >= rowCount)
+                {
+                    g.DrawLine(blackPen, startX, startY, startX + usableWidth, startY);
+                    startY += lineHeight;
+                    g.DrawString(lblTotal.Text, totalFont, Brushes.DarkRed, startX, startY);
+                    startY += lineHeight * 2;
+
+                    g.DrawString($"备注：{txtRemarks.Text}", headFont, blackBrush, startX, startY);
+                    startY += lineHeight * 2;
+
+                    g.DrawString("备注：1.货品重量和货款已核对无误，如有错账年内可核查，过期无效。", remarkFont, blackBrush, startX, startY);
+                    startY += 15;
+                    g.DrawString("2.买方承诺以上物料是合法所有，不是赃物或违法所得，如属赃物或违法所得，卖方完全承担经济和法律责任。", remarkFont, blackBrush, startX, startY);
+                }
+
+                // 6. 判断是否需要分页
+                e.HasMorePages = _printCurrentRowIndex < rowCount;
+
+                // 【修复4】释放GDI资源，避免内存泄漏导致后续打印闪退
+                titleFont.Dispose();
+                headFont.Dispose();
+                tableFont.Dispose();
+                totalFont.Dispose();
+                remarkFont.Dispose();
             }
-
-            g.DrawLine(Pens.Black, startX, startY, startX + usableWidth, startY);
-            startY += lineHeight;
-            g.DrawString(lblTotal.Text, totalFont, Brushes.DarkRed, startX, startY);
-            startY += lineHeight * 2;
-
-            g.DrawString($"备注：{txtRemarks.Text}", headFont, blackBrush, startX, startY);
-            startY += lineHeight * 2;
-
-            g.DrawString("备注：1.货品重量和货款已核对无误，如有错账年内可核查，过期无效。", remarkFont, blackBrush, startX, startY);
-            startY += 15;
-            g.DrawString("2.买方承诺以上物料是合法所有，不是赃物或违法所得，如属赃物或违法所得，卖方完全承担经济和法律责任。", remarkFont, blackBrush, startX, startY);
+            catch (Exception ex)
+            {
+                // 捕获所有异常，弹提示，绝不闪退
+                MessageBox.Show($"打印绘制过程出错：{ex.Message}", "打印错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
         #endregion
 
