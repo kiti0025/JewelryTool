@@ -107,33 +107,6 @@ namespace JewelryTool
             RefreshOrderListWithFilter();
         }
 
-        protected override void OnFormClosed(FormClosedEventArgs e)
-        {
-            base.OnFormClosed(e);
-            try
-            {
-                if (_ordersWatcher != null)
-                {
-                    _ordersWatcher.EnableRaisingEvents = false;
-                    _ordersWatcher.Changed -= OnOrdersFileChanged;
-                    _ordersWatcher.Created -= OnOrdersFileChanged;
-                    _ordersWatcher.Renamed -= OnOrdersFileChanged;
-                    _ordersWatcher.Deleted -= OnOrdersFileChanged;
-                    _ordersWatcher.Dispose();
-                    _ordersWatcher = null;
-                }
-
-                if (_reloadTimer != null)
-                {
-                    _reloadTimer.Tick -= ReloadTimer_Tick;
-                    _reloadTimer.Stop();
-                    _reloadTimer.Dispose();
-                    _reloadTimer = null;
-                }
-            }
-            catch { }
-        }
-
         #region 核心：强制从磁盘读取最新数据，彻底杜绝缓存
         /// <summary>
         /// 【核心修复】每次调用都会清空所有旧数据，从磁盘重新读取最新的文件，确保数据100%是最新的
@@ -253,55 +226,25 @@ namespace JewelryTool
             {
                 // 1. 获取所有筛选条件，增加空值防护
                 int filterCustomerId = 0;
-                string filterCustomerName = null;
-
-                // 优先通过 SelectedItem 获取 Customer 对象
-                if (cbFilterCustomer.SelectedItem is Customer selCust)
-                {
-                    filterCustomerId = selCust.Id;
-                    filterCustomerName = selCust.Name;
-                }
-                else if (cbFilterCustomer.SelectedValue != null && int.TryParse(cbFilterCustomer.SelectedValue.ToString(), out int custId))
+                if (cbFilterCustomer.SelectedValue != null && int.TryParse(cbFilterCustomer.SelectedValue.ToString(), out int custId))
                 {
                     filterCustomerId = custId;
-                    // 也尝试从本地客户列表找到对应名称
-                    var found = _customerList.FirstOrDefault(c => c.Id == custId);
-                    if (found != null) filterCustomerName = found.Name;
-                }
-                else if (cbFilterCustomer.SelectedItem != null)
-                {
-                    // 退回到显示文本匹配（防止绑定异常）
-                    filterCustomerName = cbFilterCustomer.SelectedItem.ToString();
                 }
 
-                string filterOrderType = cbFilterType.SelectedItem?.ToString()?.Trim() ?? "全部类型";
+                string filterOrderType = cbFilterType.SelectedItem?.ToString() ?? "全部类型";
                 DateTime filterStartDate = dtpStartDate.Value.Date;
                 DateTime filterEndDate = dtpEndDate.Value.Date.AddDays(1).AddSeconds(-1); // 结束日期包含当天23:59:59
 
                 // 2. 【核心】多条件组合过滤，每个条件都严格判断
                 var filteredOrders = _orderList.Where(order =>
                 {
-                    // 客户筛选：优先使用 CustomerId；如果单据里没有保存 CustomerId（0），则尝试用 CustomerName 匹配
-                    if (filterCustomerId != 0)
-                    {
-                        bool matchById = order.CustomerId == filterCustomerId;
-                        bool matchByName = false;
-                        if (!matchById && !string.IsNullOrEmpty(filterCustomerName) && !string.IsNullOrEmpty(order.CustomerName))
-                        {
-                            matchByName = string.Equals(order.CustomerName.Trim(), filterCustomerName.Trim(), StringComparison.Ordinal);
-                        }
+                    // 客户筛选：选了指定客户，就只显示该客户的单据
+                    if (filterCustomerId != 0 && order.CustomerId != filterCustomerId)
+                        return false;
 
-                        if (!matchById && !matchByName)
-                            return false;
-                    }
-
-                    // 单据类型筛选：选了指定类型，就只显示该类型的单据，比较时去除空白并做空值防护
-                    if (filterOrderType != "全部类型")
-                    {
-                        var ordType = order.OrderType?.Trim() ?? string.Empty;
-                        if (!string.Equals(ordType, filterOrderType, StringComparison.Ordinal))
-                            return false;
-                    }
+                    // 单据类型筛选：选了指定类型，就只显示该类型的单据
+                    if (filterOrderType != "全部类型" && order.OrderType != filterOrderType)
+                        return false;
 
                     // 日期筛选：只显示日期范围内的单据
                     if (order.OrderDate < filterStartDate || order.OrderDate > filterEndDate)

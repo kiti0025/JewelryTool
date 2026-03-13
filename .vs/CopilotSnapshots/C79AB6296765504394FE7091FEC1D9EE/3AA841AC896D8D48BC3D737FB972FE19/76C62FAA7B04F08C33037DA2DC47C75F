@@ -64,9 +64,8 @@
             this.splitContainer1.Location = new System.Drawing.Point(0, 0);
             this.splitContainer1.Name = "splitContainer1";
             this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // Add filter panel first so it docks to top, then add grid to fill remaining space
-            this.splitContainer1.Panel1.Controls.Add(this.dgvOrderList);
             this.splitContainer1.Panel1.Controls.Add(this.panelFilter);
+            this.splitContainer1.Panel1.Controls.Add(this.dgvOrderList);
             this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
             this.splitContainer1.Size = new System.Drawing.Size(1300, 750);
             this.splitContainer1.SplitterDistance = 350;
@@ -157,16 +156,18 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "客户名称：";
 
-            // dgvOrderList（核心修复：使用 Dock 填充剩余空间，避免手工定位导致遮挡）
+            // dgvOrderList（核心修复：起始位置严格等于panelFilter高度）
             this.dgvOrderList.AllowUserToAddRows = false;
             this.dgvOrderList.AllowUserToDeleteRows = false;
             this.dgvOrderList.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvOrderList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvOrderList.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dgvOrderList.Location = new System.Drawing.Point(0, 100); // 关键：和panelFilter高度完全一致
             this.dgvOrderList.Name = "dgvOrderList";
             this.dgvOrderList.ReadOnly = true;
             this.dgvOrderList.RowHeadersVisible = false;
             this.dgvOrderList.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dgvOrderList.Size = new System.Drawing.Size(1300, 250);
             this.dgvOrderList.TabIndex = 1;
             this.dgvOrderList.RowTemplate.Height = 24;
 

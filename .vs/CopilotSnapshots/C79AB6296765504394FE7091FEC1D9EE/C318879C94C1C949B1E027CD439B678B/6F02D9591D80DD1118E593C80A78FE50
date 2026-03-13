@@ -22,9 +22,6 @@ namespace JewelryTool
 
         // 窗体初始化完成标记，避免初始化时触发筛选
         private bool _formInitialized = false;
-        // 监视 orders.json 的文件变化，保证历史窗体能实时读取最新保存的单据
-        private FileSystemWatcher _ordersWatcher;
-        private Timer _reloadTimer;
 
         public HistoryForm(MainForm mainForm)
         {
@@ -32,69 +29,6 @@ namespace JewelryTool
             _mainFormInstance = mainForm;
             // 窗体打开时，强制先清空所有旧数据，再读最新文件
             ForceReloadAllDataFromDisk();
-            // 初始化文件监视器，监听 orders.json 的变更，使用短延时合并多次触发
-            InitializeOrdersFileWatcher();
-        }
-
-        private void InitializeOrdersFileWatcher()
-        {
-            try
-            {
-                // 确保 Data 文件夹存在
-                if (!Directory.Exists(DataFolder)) Directory.CreateDirectory(DataFolder);
-
-                _reloadTimer = new Timer();
-                _reloadTimer.Interval = 300; // ms
-                _reloadTimer.Tick += ReloadTimer_Tick;
-
-                _ordersWatcher = new FileSystemWatcher(Path.GetDirectoryName(OrdersFilePath) ?? DataFolder, Path.GetFileName(OrdersFilePath));
-                _ordersWatcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.Size;
-                _ordersWatcher.Changed += OnOrdersFileChanged;
-                _ordersWatcher.Created += OnOrdersFileChanged;
-                _ordersWatcher.Renamed += OnOrdersFileChanged;
-                _ordersWatcher.Deleted += OnOrdersFileChanged;
-                _ordersWatcher.EnableRaisingEvents = true;
-            }
-            catch
-            {
-                // 文件监视失败不要影响主流程
-            }
-        }
-
-        private void OnOrdersFileChanged(object sender, FileSystemEventArgs e)
-        {
-            // FileSystemWatcher 的事件可能来自非 UI 线程，切换到 UI 线程处理定时器
-            try
-            {
-                if (this.IsHandleCreated)
-                {
-                    this.BeginInvoke(new Action(() =>
-                    {
-                        try
-                        {
-                            _reloadTimer?.Stop();
-                            _reloadTimer?.Start();
-                        }
-                        catch { }
-                    }));
-                }
-            }
-            catch { }
-        }
-
-        private void ReloadTimer_Tick(object sender, EventArgs e)
-        {
-            try
-            {
-                _reloadTimer?.Stop();
-                // 重新读取磁盘并刷新显示（只有当窗体初始化完成时才刷新筛选，否则等 Load 时刷新）
-                ForceReloadAllDataFromDisk();
-                if (_formInitialized)
-                {
-                    RefreshOrderListWithFilter();
-                }
-            }
-            catch { }
         }
 
         private void HistoryForm_Load(object sender, EventArgs e)
@@ -105,33 +39,6 @@ namespace JewelryTool
             _formInitialized = true;
             // 首次加载显示全量单据
             RefreshOrderListWithFilter();
-        }
-
-        protected override void OnFormClosed(FormClosedEventArgs e)
-        {
-            base.OnFormClosed(e);
-            try
-            {
-                if (_ordersWatcher != null)
-                {
-                    _ordersWatcher.EnableRaisingEvents = false;
-                    _ordersWatcher.Changed -= OnOrdersFileChanged;
-                    _ordersWatcher.Created -= OnOrdersFileChanged;
-                    _ordersWatcher.Renamed -= OnOrdersFileChanged;
-                    _ordersWatcher.Deleted -= OnOrdersFileChanged;
-                    _ordersWatcher.Dispose();
-                    _ordersWatcher = null;
-                }
-
-                if (_reloadTimer != null)
-                {
-                    _reloadTimer.Tick -= ReloadTimer_Tick;
-                    _reloadTimer.Stop();
-                    _reloadTimer.Dispose();
-                    _reloadTimer = null;
-                }
-            }
-            catch { }
         }
 
         #region 核心：强制从磁盘读取最新数据，彻底杜绝缓存
@@ -253,55 +160,25 @@ namespace JewelryTool
             {
                 // 1. 获取所有筛选条件，增加空值防护
                 int filterCustomerId = 0;
-                string filterCustomerName = null;
-
-                // 优先通过 SelectedItem 获取 Customer 对象
-                if (cbFilterCustomer.SelectedItem is Customer selCust)
-                {
-                    filterCustomerId = selCust.Id;
-                    filterCustomerName = selCust.Name;
-                }
-                else if (cbFilterCustomer.SelectedValue != null && int.TryParse(cbFilterCustomer.SelectedValue.ToString(), out int custId))
+                if (cbFilterCustomer.SelectedValue != null && int.TryParse(cbFilterCustomer.SelectedValue.ToString(), out int custId))
                 {
                     filterCustomerId = custId;
-                    // 也尝试从本地客户列表找到对应名称
-                    var found = _customerList.FirstOrDefault(c => c.Id == custId);
-                    if (found != null) filterCustomerName = found.Name;
-                }
-                else if (cbFilterCustomer.SelectedItem != null)
-                {
-                    // 退回到显示文本匹配（防止绑定异常）
-                    filterCustomerName = cbFilterCustomer.SelectedItem.ToString();
                 }
 
-                string filterOrderType = cbFilterType.SelectedItem?.ToString()?.Trim() ?? "全部类型";
+                string filterOrderType = cbFilterType.SelectedItem?.ToString() ?? "全部类型";
                 DateTime filterStartDate = dtpStartDate.Value.Date;
                 DateTime filterEndDate = dtpEndDate.Value.Date.AddDays(1).AddSeconds(-1); // 结束日期包含当天23:59:59
 
                 // 2. 【核心】多条件组合过滤，每个条件都严格判断
                 var filteredOrders = _orderList.Where(order =>
                 {
-                    // 客户筛选：优先使用 CustomerId；如果单据里没有保存 CustomerId（0），则尝试用 CustomerName 匹配
-                    if (filterCustomerId != 0)
-                    {
-                        bool matchById = order.CustomerId == filterCustomerId;
-                        bool matchByName = false;
-                        if (!matchById && !string.IsNullOrEmpty(filterCustomerName) && !string.IsNullOrEmpty(order.CustomerName))
-                        {
-                            matchByName = string.Equals(order.CustomerName.Trim(), filterCustomerName.Trim(), StringComparison.Ordinal);
-                        }
+                    // 客户筛选：选了指定客户，就只显示该客户的单据
+                    if (filterCustomerId != 0 && order.CustomerId != filterCustomerId)
+                        return false;
 
-                        if (!matchById && !matchByName)
-                            return false;
-                    }
-
-                    // 单据类型筛选：选了指定类型，就只显示该类型的单据，比较时去除空白并做空值防护
-                    if (filterOrderType != "全部类型")
-                    {
-                        var ordType = order.OrderType?.Trim() ?? string.Empty;
-                        if (!string.Equals(ordType, filterOrderType, StringComparison.Ordinal))
-                            return false;
-                    }
+                    // 单据类型筛选：选了指定类型，就只显示该类型的单据
+                    if (filterOrderType != "全部类型" && order.OrderType != filterOrderType)
+                        return false;
 
                     // 日期筛选：只显示日期范围内的单据
                     if (order.OrderDate < filterStartDate || order.OrderDate > filterEndDate)
@@ -419,9 +296,6 @@ namespace JewelryTool
             // 格式化数字列
             foreach (DataGridViewColumn col in dgvOrderDetail.Columns)
             {
-                // 确保列的 Name 与 HeaderText 一致，方便通过列名访问单元格
-                if (string.IsNullOrEmpty(col.Name)) col.Name = col.HeaderText;
-
                 if (col.Name != "序号" && col.Name != "品名")
                 {
                     col.DefaultCellStyle.Format = "F2";
@@ -504,36 +378,16 @@ namespace JewelryTool
                 var newItemList = new List<OrderItem>();
                 foreach (DataGridViewRow row in dgvOrderDetail.Rows)
                 {
-                    // 跳过新建行
-                    if (row.IsNewRow) continue;
-
-                    // 逐项安全解析，尽量避免异常
-                    int itemId = 0;
-                    if (row.Cells["序号"].Value != null && int.TryParse(row.Cells["序号"].Value.ToString(), out int parsedId))
-                        itemId = parsedId;
-
-                    string productName = row.Cells["品名"].Value?.ToString() ?? string.Empty;
-
-                    decimal grossWeight = TryParseDecimalCell(row, "毛重量");
-                    decimal netWeight = TryParseDecimalCell(row, "净重量");
-                    decimal purity = TryParseDecimalCell(row, "成色");
-                    decimal unitPrice = TryParseDecimalCell(row, "单价");
-                    decimal discountedPrice = TryParseDecimalCell(row, "成色折价");
-                    decimal totalPrice = TryParseDecimalCell(row, "单项总价");
-
-                    // 如果 id 无效，使用当前列表长度+1 作为临时 id（保持非负）
-                    if (itemId <= 0) itemId = newItemList.Count + 1;
-
                     newItemList.Add(new OrderItem
                     {
-                        Id = itemId,
-                        ProductName = productName,
-                        GrossWeight = grossWeight,
-                        NetWeight = netWeight,
-                        Purity = purity,
-                        UnitPrice = unitPrice,
-                        DiscountedPrice = discountedPrice,
-                        TotalPrice = totalPrice
+                        Id = Convert.ToInt32(row.Cells["序号"].Value ?? 0),
+                        ProductName = row.Cells["品名"].Value?.ToString() ?? "",
+                        GrossWeight = Convert.ToDecimal(row.Cells["毛重量"].Value ?? 0),
+                        NetWeight = Convert.ToDecimal(row.Cells["净重量"].Value ?? 0),
+                        Purity = Convert.ToDecimal(row.Cells["成色"].Value ?? 0),
+                        UnitPrice = Convert.ToDecimal(row.Cells["单价"].Value ?? 0),
+                        DiscountedPrice = Convert.ToDecimal(row.Cells["成色折价"].Value ?? 0),
+                        TotalPrice = Convert.ToDecimal(row.Cells["单项总价"].Value ?? 0)
                     });
                 }
                 _currentSelectedOrder.Items = newItemList;
@@ -642,37 +496,6 @@ namespace JewelryTool
         #endregion
 
         #region 辅助方法
-
-        /// <summary>
-        /// 从 DataGridViewRow 的指定列安全解析 decimal 值，解析失败返回 0
-        /// </summary>
-        private decimal TryParseDecimalCell(DataGridViewRow row, string columnName)
-        {
-            if (row == null) return 0m;
-            try
-            {
-                object cellVal = null;
-                try
-                {
-                    cellVal = row.Cells[columnName].Value;
-                }
-                catch
-                {
-                    // 列名不存在或访问出错
-                    return 0m;
-                }
-
-                if (cellVal == null) return 0m;
-                if (decimal.TryParse(cellVal.ToString(), out decimal result)) return result;
-            }
-            catch
-            {
-                // 忽略解析异常，返回 0
-            }
-
-            return 0m;
-        }
-
         /// <summary>
         /// 把单据列表保存到JSON文件
         /// </summary>

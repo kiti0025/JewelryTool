@@ -3,19 +3,19 @@
   "WorkspaceRootPath": "C:\\EXE\\JewelryTool\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|c:\\exe\\jewelrytool\\historyform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|solutionrelative:historyform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|C:\\EXE\\JewelryTool\\historyform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|solutionrelative:historyform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|c:\\exe\\jewelrytool\\historyform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|solutionrelative:historyform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|c:\\exe\\jewelrytool\\historyform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|solutionrelative:historyform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|C:\\EXE\\JewelryTool\\mainform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|solutionrelative:mainform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|c:\\exe\\jewelrytool\\historyform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "AbsoluteMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|C:\\EXE\\JewelryTool\\historyform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|solutionrelative:historyform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
@@ -27,7 +27,7 @@
       "RelativeMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|solutionrelative:statsform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|c:\\exe\\jewelrytool\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|C:\\EXE\\JewelryTool\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|solutionrelative:mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -38,7 +38,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Bookmark",
@@ -58,26 +58,26 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "HistoryForm.Designer.cs",
               "DocumentMoniker": "C:\\EXE\\JewelryTool\\HistoryForm.Designer.cs",
               "RelativeDocumentMoniker": "HistoryForm.Designer.cs",
               "ToolTip": "C:\\EXE\\JewelryTool\\HistoryForm.Designer.cs",
               "RelativeToolTip": "HistoryForm.Designer.cs",
-              "ViewState": "AgIAAEsBAAAAAAAAAAAAwIkBAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAIUAAAAAAAAAAAAiwIgBAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-13T03:40:16.153Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "HistoryForm.cs",
               "DocumentMoniker": "C:\\EXE\\JewelryTool\\HistoryForm.cs",
               "RelativeDocumentMoniker": "HistoryForm.cs",
               "ToolTip": "C:\\EXE\\JewelryTool\\HistoryForm.cs",
               "RelativeToolTip": "HistoryForm.cs",
-              "ViewState": "AgIAAJQBAAAAAAAAAAAAwNIBAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAOsAAAAAAAAAAAAcwLkCAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-13T03:39:45.672Z",
               "EditorCaption": ""
@@ -91,8 +91,7 @@
               "ToolTip": "C:\\EXE\\JewelryTool\\HistoryForm.cs [\u8BBE\u8BA1]",
               "RelativeToolTip": "HistoryForm.cs [\u8BBE\u8BA1]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-13T03:39:39.444Z",
-              "EditorCaption": " [\u8BBE\u8BA1]"
+              "WhenOpened": "2026-03-13T03:39:39.444Z"
             },
             {
               "$type": "Document",
@@ -104,8 +103,7 @@
               "RelativeToolTip": "StatsForm.cs",
               "ViewState": "AgIAALsAAAAAAAAAAAAAwOUAAABSAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-12T10:03:41.856Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-12T10:03:41.856Z"
             },
             {
               "$type": "Document",
@@ -117,8 +115,7 @@
               "RelativeToolTip": "StatsForm.Designer.cs",
               "ViewState": "AgIAAJkAAAAAAAAAAAAAwNcAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-12T10:03:16.463Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-12T10:03:16.463Z"
             },
             {
               "$type": "Document",
@@ -130,8 +127,7 @@
               "RelativeToolTip": "MainForm.Designer.cs",
               "ViewState": "AgIAAEcBAAAAAAAAAAAAwIUBAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-12T09:03:14.899Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-12T09:03:14.899Z"
             },
             {
               "$type": "Document",
@@ -143,8 +139,7 @@
               "RelativeToolTip": "MainForm.cs",
               "ViewState": "AgIAAGECAAAAAAAAAAAAwJ8CAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-12T08:35:51.521Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-12T08:35:51.521Z"
             }
           ]
         }

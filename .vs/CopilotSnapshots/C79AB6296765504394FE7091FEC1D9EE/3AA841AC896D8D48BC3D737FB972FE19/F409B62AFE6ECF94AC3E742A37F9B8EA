@@ -64,9 +64,8 @@
             this.splitContainer1.Location = new System.Drawing.Point(0, 0);
             this.splitContainer1.Name = "splitContainer1";
             this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // Add filter panel first so it docks to top, then add grid to fill remaining space
-            this.splitContainer1.Panel1.Controls.Add(this.dgvOrderList);
             this.splitContainer1.Panel1.Controls.Add(this.panelFilter);
+            this.splitContainer1.Panel1.Controls.Add(this.dgvOrderList);
             this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
             this.splitContainer1.Size = new System.Drawing.Size(1300, 750);
             this.splitContainer1.SplitterDistance = 350;
