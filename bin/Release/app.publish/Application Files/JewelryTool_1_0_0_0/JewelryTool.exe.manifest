@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:co.v1="urn:schemas-microsoft-com:clickonce.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:co.v2="urn:schemas-microsoft-com:clickonce.v2">
+  <asmv1:assemblyIdentity name="JewelryTool.exe" version="1.0.0.0" publicKeyToken="4da236d01fde8e47" language="neutral" processorArchitecture="msil" type="win32" />
+  <application />
+  <entryPoint>
+    <assemblyIdentity name="JewelryTool" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
+    <commandLine file="JewelryTool.exe" parameters="" />
+  </entryPoint>
+  <trustInfo>
+    <security>
+      <applicationRequestMinimum>
+        <PermissionSet Unrestricted="true" ID="Custom" SameSite="site" />
+        <defaultAssemblyRequest permissionSetReference="Custom" />
+      </applicationRequestMinimum>
+      <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
+        <!--
+          UAC 清单选项
+          如果要更改 Windows 用户帐户控制级别，请用以下节点之一替换
+          requestedExecutionLevel 节点。
+
+        <requestedExecutionLevel  level="asInvoker" uiAccess="false" />
+        <requestedExecutionLevel  level="requireAdministrator" uiAccess="false" />
+        <requestedExecutionLevel  level="highestAvailable" uiAccess="false" />
+
+          如果要利用文件和注册表虚拟化提供
+          向后兼容性，请删除 requestedExecutionLevel 节点。
+    -->
+        <requestedExecutionLevel level="asInvoker" uiAccess="false" />
+      </requestedPrivileges>
+    </security>
+  </trustInfo>
+  <dependency>
+    <dependentOS>
+      <osVersionInfo>
+        <os majorVersion="5" minorVersion="1" buildNumber="2600" servicePackMajor="0" />
+      </osVersionInfo>
+    </dependentOS>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="preRequisite" allowDelayedBinding="true">
+      <assemblyIdentity name="Microsoft.Windows.CommonLanguageRuntime" version="4.0.30319.0" />
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="EPPlusFree.dll" size="1303552">
+      <assemblyIdentity name="EPPlusFree" version="4.5.3.8" publicKeyToken="85BFA0499E2DB48A" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>elGcgi1z+t62WZeBoHmsoGEXDdbV/BGQ0JomexIy818=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="JewelryTool.exe" size="55736">
+      <assemblyIdentity name="JewelryTool" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>FoqFlO8B+D+/+AxsFNcDFWxba5pQtJ9q1LpG1OiyabI=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Newtonsoft.Json.dll" size="721320">
+      <assemblyIdentity name="Newtonsoft.Json" version="13.0.0.0" publicKeyToken="30AD4FE6B2A6AEED" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>8MB68OhNTdTaS9eCO6RTW8BIGzv2I+1Atlm2gUemu3U=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="System.Data.SQLite.dll" size="398336">
+      <assemblyIdentity name="System.Data.SQLite" version="2.0.2.0" publicKeyToken="DB937BC2D44FF139" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>q68SEM0qLFKCofI5JwkC1AlKh4Z9MuZ880KcYQerAdM=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <file name="JewelryTool.exe.config" size="189">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>R+Wg8QGvQVHX8T0ta/qbhH1bXkqY0fRnS3wBV3J0bN8=</dsig:DigestValue>
+    </hash>
+  </file>
+<publisherIdentity name="CN=XJL\0101250025" issuerKeyHash="093ed3171e7310b73e9c35ce7544d3374041b4c7" /><Signature Id="StrongNameSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha256" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" /><DigestValue>rpCdANYIbEvBHVe245upRbfxZjST226Nwo1t6aBe6bs=</DigestValue></Reference></SignedInfo><SignatureValue>L+fjbLxI0IK7/ZGGyfPPhElCO0r4DMpUH+IH4So2lErT20lhCFQZsY9ks/Ii1JBFZmHHZCSYsiC8224hpvO2tR2gJ3D9ZQI2B/z2+xp3i8nvhExqrWyAzIJ40zNCmpuPfnOWHDgfdmPo4qaKBItcvKyZKvxZyLB6hW5WRwpRZR4=</SignatureValue><KeyInfo Id="StrongNameKeyInfo"><KeyValue><RSAKeyValue><Modulus>tTEuq+SPb/DHpqOnEg3xIECeeFQA3G3PgbXj4jQEIcuISWW9yjOS6AN2pYDj/oj2mB0Qxlfy1Bi9+nqCi1d1c9s+nlTMmJ9/Tads2ajUQIgwGoKI8U7cq32q0Sq956h/Lg2ooFIE5+vH3pGNts+1xcNAT85rmXb8YaBWn2UgdV0=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><msrel:RelData xmlns:msrel="http://schemas.microsoft.com/windows/rel/2005/reldata"><r:license xmlns:r="urn:mpeg:mpeg21:2003:01-REL-R-NS" xmlns:as="http://schemas.microsoft.com/windows/pki/2005/Authenticode"><r:grant><as:ManifestInformation Hash="bbe95ea0e96d8dc28d6edb933466f1b745a99be3b6571dc14b6c08d6009d90ae" Description="" Url=""><as:assemblyIdentity name="JewelryTool.exe" version="1.0.0.0" publicKeyToken="4da236d01fde8e47" language="neutral" processorArchitecture="msil" type="win32" /></as:ManifestInformation><as:SignedBy /><as:AuthenticodePublisher><as:X509SubjectName>CN=XJL\0101250025</as:X509SubjectName></as:AuthenticodePublisher></r:grant><r:issuer><Signature Id="AuthenticodeSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha256" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" /><DigestValue>g936plZKTqHBTx4hegr32M03X37Cj1dZ5ygUeBmPfVs=</DigestValue></Reference></SignedInfo><SignatureValue>E3NpBg2ZGhIp6FXb97ycSTDCiVLm6AwjS69MysyKrxgCV7mbINwMYqW6FrmFMke5T1FQP4rt5zcpib+H3+wW4QwhZZRK4a5/D4iNXZr9ClsTrL8/u/pjqsplA0e7wB32ohpEYaAQ1W9qYLjXNg+L1c4AyjoEfyTpwNQrz5uC3oA=</SignatureValue><KeyInfo><KeyValue><RSAKeyValue><Modulus>tTEuq+SPb/DHpqOnEg3xIECeeFQA3G3PgbXj4jQEIcuISWW9yjOS6AN2pYDj/oj2mB0Qxlfy1Bi9+nqCi1d1c9s+nlTMmJ9/Tads2ajUQIgwGoKI8U7cq32q0Sq956h/Lg2ooFIE5+vH3pGNts+1xcNAT85rmXb8YaBWn2UgdV0=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><X509Data><X509Certificate>MIIB0TCCATqgAwIBAgIQMcf5xQRx4aRLOxvywMe94jANBgkqhkiG9w0BAQsFADAnMSUwIwYDVQQDHhwAWABKAEwAXAAwADEAMAAxADIANQAwADAAMgA1MB4XDTI2MDMxMzAwMzEyNFoXDTI3MDMxMzA2MzEyNFowJzElMCMGA1UEAx4cAFgASgBMAFwAMAAxADAAMQAyADUAMAAwADIANTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAtTEuq+SPb/DHpqOnEg3xIECeeFQA3G3PgbXj4jQEIcuISWW9yjOS6AN2pYDj/oj2mB0Qxlfy1Bi9+nqCi1d1c9s+nlTMmJ9/Tads2ajUQIgwGoKI8U7cq32q0Sq956h/Lg2ooFIE5+vH3pGNts+1xcNAT85rmXb8YaBWn2UgdV0CAwEAATANBgkqhkiG9w0BAQsFAAOBgQCyzystfW4walXRLLfPCorP88Y68EW6zFRNc0a7y2DviAk5GjFhtPw173z/p6PXUcm3ssn731SfBnET5id8UgMPomisElPKMMy5pXxlrghqlyYTFsONw803nH/k8afsfsaXdfF9vne+SKLarCwz2WAgELaOakTB5ilUG0wvKJTmQw==</X509Certificate></X509Data></KeyInfo></Signature></r:issuer></r:license></msrel:RelData></KeyInfo></Signature></asmv1:assembly>

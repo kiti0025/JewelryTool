@@ -1,0 +1,123 @@
+[
+  {
+    "Id": 1,
+    "CustomerId": 1,
+    "CustomerName": "零售客户",
+    "OrderDate": "2026-03-12T17:49:36.1305159+08:00",
+    "OrderType": "入库",
+    "GrandTotal": 500.00,
+    "Remarks": "",
+    "Items": [
+      {
+        "Id": 1,
+        "ProductId": 1,
+        "ProductName": "黄金",
+        "GrossWeight": 100.0,
+        "NetWeight": 100.0,
+        "Purity": 1.0,
+        "UnitPrice": 5.0,
+        "DiscountedPrice": 5.0,
+        "TotalPrice": 500.0
+      }
+    ]
+  },
+  {
+    "Id": 2,
+    "CustomerId": 1,
+    "CustomerName": "零售客户",
+    "OrderDate": "2026-03-12T17:53:00.8339765+08:00",
+    "OrderType": "入库",
+    "GrandTotal": 125776.00,
+    "Remarks": "",
+    "Items": [
+      {
+        "Id": 1,
+        "ProductId": 9,
+        "ProductName": "Test",
+        "GrossWeight": 12.0,
+        "NetWeight": 112.0,
+        "Purity": 1.0,
+        "UnitPrice": 1123.0,
+        "DiscountedPrice": 1123.0,
+        "TotalPrice": 125776.0
+      }
+    ]
+  },
+  {
+    "Id": 3,
+    "CustomerId": 4,
+    "CustomerName": "Test客户",
+    "OrderDate": "2026-03-12T17:59:18.0283954+08:00",
+    "OrderType": "入库",
+    "GrandTotal": 132.00,
+    "Remarks": "",
+    "Items": [
+      {
+        "Id": 1,
+        "ProductId": 9,
+        "ProductName": "Test",
+        "GrossWeight": 11.0,
+        "NetWeight": 22.0,
+        "Purity": 2.0,
+        "UnitPrice": 3.0,
+        "DiscountedPrice": 6.0,
+        "TotalPrice": 132.0
+      }
+    ]
+  },
+  {
+    "Id": 4,
+    "CustomerId": 1,
+    "CustomerName": "零售客户",
+    "OrderDate": "2026-03-12T18:05:46.7388646+08:00",
+    "OrderType": "入库",
+    "GrandTotal": 997003099.00,
+    "Remarks": "全是999，做个测试，哈哈哈",
+    "Items": [
+      {
+        "Id": 1,
+        "ProductId": 9,
+        "ProductName": "Test",
+        "GrossWeight": 999.0,
+        "NetWeight": 999.0,
+        "Purity": 999.0,
+        "UnitPrice": 999.0,
+        "DiscountedPrice": 998001.0,
+        "TotalPrice": 997002999.0
+      },
+      {
+        "Id": 2,
+        "ProductId": 9,
+        "ProductName": "Test",
+        "GrossWeight": 100.0,
+        "NetWeight": 100.0,
+        "Purity": 1.0,
+        "UnitPrice": 1.0,
+        "DiscountedPrice": 1.0,
+        "TotalPrice": 100.0
+      }
+    ]
+  },
+  {
+    "Id": 5,
+    "CustomerId": 4,
+    "CustomerName": "Test客户",
+    "OrderDate": "2026-03-04T07:55:43",
+    "OrderType": "入库",
+    "GrandTotal": 16.00,
+    "Remarks": "",
+    "Items": [
+      {
+        "Id": 1,
+        "ProductId": 1,
+        "ProductName": "黄金",
+        "GrossWeight": 23.0,
+        "NetWeight": 20.0,
+        "Purity": 0.8,
+        "UnitPrice": 1.0,
+        "DiscountedPrice": 0.8,
+        "TotalPrice": 16.0
+      }
+    ]
+  }
+]
