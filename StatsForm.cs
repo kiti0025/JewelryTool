@@ -55,9 +55,6 @@ namespace JewelryTool
             CalculateDailyStats();
         }
 
-        /// <summary>
-        /// 1. 品类库存&均价统计（总库存均价）
-        /// </summary>
         private void CalculateProductStats()
         {
             var stats = from p in products
@@ -88,12 +85,8 @@ namespace JewelryTool
             }
         }
 
-        /// <summary>
-        /// 2. 每百克阶梯均价（0-5000g，支持多选合并计算）
-        /// </summary>
         private void CalculatePriceStats()
         {
-            // 生成阶梯：0-100, 100-200, ..., 4900-5000, 5000以上
             var tiers = new List<dynamic>();
             for (int i = 0; i < 50; i++)
             {
@@ -125,9 +118,6 @@ namespace JewelryTool
             }
         }
 
-        /// <summary>
-        /// 3. 每日出入库统计（单日均价，与总库存完全分开）
-        /// </summary>
         private void CalculateDailyStats()
         {
             var stats = from o in orders
@@ -164,7 +154,7 @@ namespace JewelryTool
         {
             LoadAllData();
             CalculateAllStats();
-            MessageBox.Show("数据已刷新！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("数据刷新完成", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void BtnExportStats_Click(object sender, EventArgs e)
@@ -179,21 +169,18 @@ namespace JewelryTool
                 {
                     using (var package = new ExcelPackage())
                     {
-                        // Sheet1：总库存均价（品类维度）
                         var sheet1 = package.Workbook.Worksheets.Add("总库存均价统计");
                         ExportGridViewToSheet(dgvProductStats, sheet1);
 
-                        // Sheet2：阶梯均价
                         var sheet2 = package.Workbook.Worksheets.Add("每百克阶梯均价");
                         ExportGridViewToSheet(dgvPriceStats, sheet2);
 
-                        // Sheet3：单日均价（每日维度）
                         var sheet3 = package.Workbook.Worksheets.Add("每日出入库统计");
                         ExportGridViewToSheet(dgvDailyStats, sheet3);
 
                         package.SaveAs(new FileInfo(sfd.FileName));
                     }
-                    MessageBox.Show("统计报表导出成功！\n\n说明：\n- 「总库存均价统计」为全历史累计数据\n- 「每日出入库统计」为单日单独计算均价", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("报表导出成功", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
                 {
@@ -202,14 +189,11 @@ namespace JewelryTool
             }
         }
 
-        /// <summary>
-        /// 阶梯均价表格选择变化，实时计算合并均价
-        /// </summary>
         private void DgvPriceStats_SelectionChanged(object sender, EventArgs e)
         {
             if (dgvPriceStats.SelectedRows.Count == 0)
             {
-                lblSelectedStats.Text = "请在上方表格选择多个重量阶梯，查看合并均价";
+                lblSelectedStats.Text = "选择重量阶梯可查看合并均价";
                 return;
             }
 
@@ -224,7 +208,7 @@ namespace JewelryTool
 
             decimal avgPer100g = totalAmount / (totalWeight + 0.0001m) * 100;
 
-            lblSelectedStats.Text = $"已选 {dgvPriceStats.SelectedRows.Count} 个阶梯 | 合并总重量：{totalWeight:F2}g | 合并总金额：{totalAmount:F2}元 | 合并每百克均价：{avgPer100g:F2}元";
+            lblSelectedStats.Text = $"已选 {dgvPriceStats.SelectedRows.Count} 项 | 总重量：{totalWeight:F2}g | 总金额：{totalAmount:F2}元 | 合并每百克均价：{avgPer100g:F2}元";
         }
 
         private void ExportGridViewToSheet(DataGridView dgv, ExcelWorksheet sheet)

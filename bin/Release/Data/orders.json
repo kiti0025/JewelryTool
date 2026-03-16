@@ -1,0 +1,24 @@
+[
+  {
+    "Id": 1,
+    "CustomerId": 1,
+    "CustomerName": "零售客户",
+    "OrderDate": "2026-03-16T17:22:26.3195767+08:00",
+    "OrderType": "入库",
+    "GrandTotal": 2.00,
+    "Remarks": "",
+    "Items": [
+      {
+        "Id": 1,
+        "ProductId": 4,
+        "ProductName": "pt900",
+        "GrossWeight": 1.0,
+        "NetWeight": 1.0,
+        "Purity": 1.0,
+        "UnitPrice": 2.0,
+        "DiscountedPrice": 2.0,
+        "TotalPrice": 2.0
+      }
+    ]
+  }
+]

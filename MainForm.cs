@@ -13,7 +13,7 @@ namespace JewelryTool
 {
     public partial class MainForm : Form
     {
-        // 数据文件路径（固定，不用改）
+        // 数据文件路径
         private static readonly string DataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
         private static readonly string CustomersFile = Path.Combine(DataFolder, "customers.json");
         private static readonly string ProductsFile = Path.Combine(DataFolder, "products.json");
@@ -24,7 +24,7 @@ namespace JewelryTool
         private List<Product> products = new List<Product>();
         private List<Order> orders = new List<Order>();
 
-        // 打印相关配置
+        // 打印配置
         private PageSettings printPageSettings = new PageSettings();
 
         public MainForm()
@@ -36,7 +36,7 @@ namespace JewelryTool
             InitPrintDefaultSetting();
         }
 
-        #region 初始化数据
+        #region 初始化
         private void InitDataFolder()
         {
             if (!Directory.Exists(DataFolder))
@@ -45,7 +45,7 @@ namespace JewelryTool
 
         private void LoadAllData()
         {
-            // 加载客户列表
+            // 加载客户
             if (File.Exists(CustomersFile))
             {
                 string json = File.ReadAllText(CustomersFile);
@@ -61,7 +61,7 @@ namespace JewelryTool
                 SaveCustomersToJson();
             }
 
-            // 加载品类列表
+            // 加载品类
             if (File.Exists(ProductsFile))
             {
                 string json = File.ReadAllText(ProductsFile);
@@ -82,7 +82,7 @@ namespace JewelryTool
                 SaveProductsToJson();
             }
 
-            // 加载历史单据
+            // 加载单据
             if (File.Exists(OrdersFile))
             {
                 string json = File.ReadAllText(OrdersFile);
@@ -93,24 +93,23 @@ namespace JewelryTool
                 orders = new List<Order>();
             }
 
-            // 绑定下拉框数据
+            // 绑定客户下拉
             cbCustomer.DataSource = null;
             cbCustomer.DataSource = customers;
             cbCustomer.DisplayMember = "Name";
             cbCustomer.ValueMember = "Id";
 
-            // 客户搜索功能
             cbCustomer.DropDownStyle = ComboBoxStyle.DropDown;
             cbCustomer.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
             cbCustomer.AutoCompleteSource = AutoCompleteSource.ListItems;
 
-            // 绑定表格的品名下拉
+            // 绑定表格品名下拉
             colProduct.DataSource = null;
             colProduct.DataSource = products;
             colProduct.DisplayMember = "Name";
             colProduct.ValueMember = "Id";
 
-            // 初始化默认值（日期精确到分钟）
+            // 日期格式
             dtpDate.Value = DateTime.Now;
             dtpDate.Format = DateTimePickerFormat.Custom;
             dtpDate.CustomFormat = "yyyy-MM-dd HH:mm";
@@ -120,7 +119,6 @@ namespace JewelryTool
 
         private void BindControlEvents()
         {
-            // 按钮事件
             btnAddRow.Click += BtnAddRow_Click;
             btnDeleteRow.Click += BtnDeleteRow_Click;
             btnSave.Click += BtnSave_Click;
@@ -132,17 +130,15 @@ namespace JewelryTool
             btnAddProduct.Click += BtnAddProduct_Click;
             btnHistory.Click += BtnHistory_Click;
 
-            // 表格事件
             dgvItems.CellEndEdit += DgvItems_CellEndEdit;
             dgvItems.RowsAdded += (s, e) => RefreshRowNumber();
 
-            // 界面缩放事件
             cbZoom.SelectedIndexChanged += CbZoom_SelectedIndexChanged;
         }
 
         private void InitPrintDefaultSetting()
         {
-            // 适配二分复写纸241mm×139.7mm
+            // 适配二分复写纸 241mm×139.7mm
             int paperWidth = (int)Math.Round(241 / 0.254);
             int paperHeight = (int)Math.Round(139.7 / 0.254);
 
@@ -159,7 +155,7 @@ namespace JewelryTool
         }
         #endregion
 
-        #region JSON数据保存方法
+        #region 数据保存
         private void SaveCustomersToJson()
         {
             try
@@ -167,12 +163,12 @@ namespace JewelryTool
                 if (!Directory.Exists(DataFolder))
                     Directory.CreateDirectory(DataFolder);
 
-                string json = JsonConvert.SerializeObject(customers, Newtonsoft.Json.Formatting.Indented);
+                string json = JsonConvert.SerializeObject(customers, Formatting.Indented);
                 File.WriteAllText(CustomersFile, json);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"保存客户数据失败：{ex.Message}\n路径：{CustomersFile}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"保存客户数据失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -183,12 +179,12 @@ namespace JewelryTool
                 if (!Directory.Exists(DataFolder))
                     Directory.CreateDirectory(DataFolder);
 
-                string json = JsonConvert.SerializeObject(products, Newtonsoft.Json.Formatting.Indented);
+                string json = JsonConvert.SerializeObject(products, Formatting.Indented);
                 File.WriteAllText(ProductsFile, json);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"保存品类数据失败：{ex.Message}\n路径：{ProductsFile}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"保存品类数据失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -199,12 +195,12 @@ namespace JewelryTool
                 if (!Directory.Exists(DataFolder))
                     Directory.CreateDirectory(DataFolder);
 
-                string json = JsonConvert.SerializeObject(orders, Newtonsoft.Json.Formatting.Indented);
+                string json = JsonConvert.SerializeObject(orders, Formatting.Indented);
                 File.WriteAllText(OrdersFile, json);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"保存单据数据失败：{ex.Message}\n路径：{OrdersFile}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"保存单据失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -214,10 +210,10 @@ namespace JewelryTool
         }
         #endregion
 
-        #region 界面操作方法
+        #region 界面操作
         private void BtnAddCustomer_Click(object sender, EventArgs e)
         {
-            string custName = Interaction.InputBox("请输入客户名称：", "新增客户", "");
+            string custName = Interaction.InputBox("请输入客户名称", "新增客户", "");
             if (string.IsNullOrWhiteSpace(custName)) return;
 
             int newId = customers.Count > 0 ? customers.Max(c => c.Id) + 1 : 1;
@@ -229,12 +225,12 @@ namespace JewelryTool
             cbCustomer.DisplayMember = "Name";
             cbCustomer.ValueMember = "Id";
 
-            MessageBox.Show("客户新增成功！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("客户添加成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void BtnAddProduct_Click(object sender, EventArgs e)
         {
-            string prodName = Interaction.InputBox("请输入品类名称：", "新增品类", "");
+            string prodName = Interaction.InputBox("请输入品类名称", "新增品类", "");
             if (string.IsNullOrWhiteSpace(prodName)) return;
 
             int newId = products.Count > 0 ? products.Max(p => p.Id) + 1 : 1;
@@ -246,7 +242,7 @@ namespace JewelryTool
             colProduct.DisplayMember = "Name";
             colProduct.ValueMember = "Id";
 
-            MessageBox.Show("品类新增成功！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("品类添加成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void BtnAddRow_Click(object sender, EventArgs e)
@@ -261,7 +257,7 @@ namespace JewelryTool
         {
             if (dgvItems.SelectedRows.Count == 0 || dgvItems.SelectedRows[0].IsNewRow)
             {
-                MessageBox.Show("请先选中要删除的行", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("请选择要删除的行", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -301,13 +297,13 @@ namespace JewelryTool
         }
         #endregion
 
-        #region 自动计算逻辑
+        #region 自动计算
         private void DgvItems_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0) return;
             var currentRow = dgvItems.Rows[e.RowIndex];
 
-            // 1. 计算成色折价 = 成色 * 单价（截断1位小数）
+            // 成色折价
             decimal purity = 0, unitPrice = 0;
             if (decimal.TryParse(currentRow.Cells[colPurity.Name].Value?.ToString(), out purity)
                 && decimal.TryParse(currentRow.Cells[colUnitPrice.Name].Value?.ToString(), out unitPrice))
@@ -316,7 +312,7 @@ namespace JewelryTool
                 currentRow.Cells[colDiscountedPrice.Name].Value = Math.Truncate(discountPrice * 10) / 10;
             }
 
-            // 2. 计算单项总价 = 净重量 * 成色折价
+            // 单项总价
             decimal netWeight = 0, finalDiscountPrice = 0;
             if (decimal.TryParse(currentRow.Cells[colNetWeight.Name].Value?.ToString(), out netWeight)
                 && decimal.TryParse(currentRow.Cells[colDiscountedPrice.Name].Value?.ToString(), out finalDiscountPrice))
@@ -324,7 +320,6 @@ namespace JewelryTool
                 currentRow.Cells[colTotalPrice.Name].Value = netWeight * finalDiscountPrice;
             }
 
-            // 3. 更新单据总价
             UpdateTotalPrice();
         }
 
@@ -342,12 +337,12 @@ namespace JewelryTool
         }
         #endregion
 
-        #region 核心功能按钮
+        #region 核心功能
         private void BtnSave_Click(object sender, EventArgs e)
         {
             if (dgvItems.Rows.Count == 0)
             {
-                MessageBox.Show("请先添加明细数据", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("请添加货品明细后保存", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -356,7 +351,7 @@ namespace JewelryTool
                 var selectedCust = cbCustomer.SelectedItem as Customer;
                 if (selectedCust == null)
                 {
-                    MessageBox.Show("请先选择客户", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("请选择客户", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
@@ -396,11 +391,7 @@ namespace JewelryTool
                 orders.Add(newOrder);
                 SaveOrdersToJson();
 
-                MessageBox.Show(
-                    $"单据保存成功！\n单据号：{newOrderId}\n\n数据文件保存在：\n{DataFolder}",
-                    "成功",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
+                MessageBox.Show($"单据保存成功！单据号：{newOrderId}", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 dgvItems.Rows.Clear();
                 txtRemarks.Clear();
@@ -408,7 +399,7 @@ namespace JewelryTool
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"保存失败：{ex.Message}\n\n堆栈跟踪：{ex.StackTrace}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"保存失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -482,7 +473,7 @@ namespace JewelryTool
                         sheet.Cells.AutoFitColumns();
                         package.SaveAs(new FileInfo(sfd.FileName));
                     }
-                    MessageBox.Show("Excel导出成功！", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("导出完成", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
                 {
@@ -491,7 +482,7 @@ namespace JewelryTool
             }
         }
 
-        #region 打印相关功能（修复版：彻底解决闪退，优化显示）
+        #region 打印
         private void BtnPrintSetting_Click(object sender, EventArgs e)
         {
             try
@@ -503,13 +494,13 @@ namespace JewelryTool
                     if (pageSetupDialog.ShowDialog() == DialogResult.OK)
                     {
                         printPageSettings = pageSetupDialog.PageSettings;
-                        MessageBox.Show("打印纸张设置已保存！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("打印设置已保存", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"打印设置失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"打印设置异常：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -517,25 +508,22 @@ namespace JewelryTool
         {
             try
             {
-                // 【修复1】打印前先检查必填数据
                 if (dgvItems.Rows.Count == 0)
                 {
-                    MessageBox.Show("没有可打印的明细数据，请先添加货品！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("请添加货品后打印", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
                 if (cbCustomer.SelectedItem == null)
                 {
-                    MessageBox.Show("请先选择客户！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("请选择客户", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
-                // 初始化打印文档
                 PrintDocument printDoc = new PrintDocument();
                 printDoc.DefaultPageSettings = printPageSettings;
                 printDoc.PrintPage += PrintDoc_PrintPage;
                 printDoc.BeginPrint += PrintDoc_BeginPrint;
 
-                // 先弹出预览，方便测试
                 PrintPreviewDialog preview = new PrintPreviewDialog();
                 preview.Document = printDoc;
                 preview.WindowState = FormWindowState.Maximized;
@@ -543,22 +531,18 @@ namespace JewelryTool
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"启动打印失败：{ex.Message}\n\n详细信息：{ex.StackTrace}", "打印错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"打印启动失败：{ex.Message}", "打印错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        // 打印开始前的初始化
         private int _printCurrentRowIndex = 0;
         private void PrintDoc_BeginPrint(object sender, PrintEventArgs e)
         {
-            // 重置打印行索引，支持多次打印
             _printCurrentRowIndex = 0;
         }
 
-        // 【核心修复】打印内容绘制，加了异常捕获、资源释放、品名列修复
         private void PrintDoc_PrintPage(object sender, PrintPageEventArgs e)
         {
-            // 【修复2】全流程加异常捕获，绝对不会闪退
             try
             {
                 Graphics g = e.Graphics;
@@ -567,7 +551,6 @@ namespace JewelryTool
                 int startY = printArea.Top;
                 int usableWidth = printArea.Width;
 
-                // 定义字体，用完后释放
                 Font titleFont = new Font("微软雅黑", 12, FontStyle.Bold);
                 Font headFont = new Font("微软雅黑", 9);
                 Font tableFont = new Font("微软雅黑", 8);
@@ -578,11 +561,11 @@ namespace JewelryTool
 
                 int lineHeight = 20;
 
-                // 1. 打印标题
+                // 标题
                 g.DrawString("瑞华珠宝兑料单", titleFont, blackBrush, startX + usableWidth / 2 - 80, startY);
                 startY += 30;
 
-                // 2. 打印单据基础信息（加空值防护）
+                // 基础信息
                 string custName = (cbCustomer.SelectedItem as Customer)?.Name ?? "未知客户";
                 string custText = $"客户：{custName}";
                 string dateText = $"日期：{dtpDate.Value:yyyy-MM-dd HH:mm}";
@@ -593,7 +576,7 @@ namespace JewelryTool
                 g.DrawString(typeText, headFont, blackBrush, startX + usableWidth * 2 / 3, startY);
                 startY += lineHeight * 2;
 
-                // 3. 打印明细表头
+                // 表头
                 string[] tableHeaders = { "序号", "品名", "毛重", "净重", "成色", "单价", "折价", "总价" };
                 int[] colWidths = new int[8];
                 colWidths[0] = (int)(usableWidth * 0.07);
@@ -614,7 +597,7 @@ namespace JewelryTool
                 startY += lineHeight;
                 g.DrawLine(blackPen, startX, startY - 5, startX + usableWidth, startY - 5);
 
-                // 4. 【修复3】打印明细行（品名列显示名称而不是ID，支持分页）
+                // 明细
                 int rowCount = dgvItems.Rows.Count;
                 while (_printCurrentRowIndex < rowCount && (startY + lineHeight) < printArea.Bottom - 100)
                 {
@@ -625,7 +608,6 @@ namespace JewelryTool
                     {
                         string cellText = "";
 
-                        // 品名列特殊处理：把ID转换成产品名称
                         if (i == 1)
                         {
                             object cellValue = row.Cells[i].Value;
@@ -637,7 +619,6 @@ namespace JewelryTool
                         }
                         else
                         {
-                            // 其他列直接显示
                             object cellValue = row.Cells[i].Value;
                             cellText = cellValue?.ToString() ?? "";
                         }
@@ -650,7 +631,7 @@ namespace JewelryTool
                     _printCurrentRowIndex++;
                 }
 
-                // 5. 打印底部合计和备注（只有最后一页才显示）
+                // 合计与备注
                 if (_printCurrentRowIndex >= rowCount)
                 {
                     g.DrawLine(blackPen, startX, startY, startX + usableWidth, startY);
@@ -666,10 +647,8 @@ namespace JewelryTool
                     g.DrawString("2.买方承诺以上物料是合法所有，不是赃物或违法所得，如属赃物或违法所得，卖方完全承担经济和法律责任。", remarkFont, blackBrush, startX, startY);
                 }
 
-                // 6. 判断是否需要分页
                 e.HasMorePages = _printCurrentRowIndex < rowCount;
 
-                // 【修复4】释放GDI资源，避免内存泄漏导致后续打印闪退
                 titleFont.Dispose();
                 headFont.Dispose();
                 tableFont.Dispose();
@@ -678,8 +657,7 @@ namespace JewelryTool
             }
             catch (Exception ex)
             {
-                // 捕获所有异常，弹提示，绝不闪退
-                MessageBox.Show($"打印绘制过程出错：{ex.Message}", "打印错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"打印内容生成失败：{ex.Message}", "打印错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         #endregion
@@ -721,7 +699,7 @@ namespace JewelryTool
         #endregion
     }
 
-    #region 数据模型
+    #region 实体类
     public class Customer
     {
         public int Id { get; set; }

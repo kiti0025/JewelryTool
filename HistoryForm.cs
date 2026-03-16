@@ -9,20 +9,16 @@ namespace JewelryTool
 {
     public partial class HistoryForm : Form
     {
-        // 固定数据路径，和主窗体完全一致
         private static readonly string DataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
         private static readonly string CustomersFilePath = Path.Combine(DataFolder, "customers.json");
         private static readonly string OrdersFilePath = Path.Combine(DataFolder, "orders.json");
 
-        // 数据容器，每次加载都会彻底重置
         private List<Customer> _customerList = new List<Customer>();
         private List<Order> _orderList = new List<Order>();
         private Order _currentSelectedOrder = null;
         private readonly MainForm _mainFormInstance;
 
-        // 窗体初始化完成标记，避免初始化时触发筛选
         private bool _formInitialized = false;
-        // 监视 orders.json 的文件变化，保证历史窗体能实时读取最新保存的单据
         private FileSystemWatcher _ordersWatcher;
         private Timer _reloadTimer;
 
@@ -30,9 +26,7 @@ namespace JewelryTool
         {
             InitializeComponent();
             _mainFormInstance = mainForm;
-            // 窗体打开时，强制先清空所有旧数据，再读最新文件
             ForceReloadAllDataFromDisk();
-            // 初始化文件监视器，监听 orders.json 的变更，使用短延时合并多次触发
             InitializeOrdersFileWatcher();
         }
 
@@ -40,11 +34,11 @@ namespace JewelryTool
         {
             try
             {
-                // 确保 Data 文件夹存在
-                if (!Directory.Exists(DataFolder)) Directory.CreateDirectory(DataFolder);
+                if (!Directory.Exists(DataFolder))
+                    Directory.CreateDirectory(DataFolder);
 
                 _reloadTimer = new Timer();
-                _reloadTimer.Interval = 300; // ms
+                _reloadTimer.Interval = 300;
                 _reloadTimer.Tick += ReloadTimer_Tick;
 
                 _ordersWatcher = new FileSystemWatcher(Path.GetDirectoryName(OrdersFilePath) ?? DataFolder, Path.GetFileName(OrdersFilePath));
@@ -55,20 +49,16 @@ namespace JewelryTool
                 _ordersWatcher.Deleted += OnOrdersFileChanged;
                 _ordersWatcher.EnableRaisingEvents = true;
             }
-            catch
-            {
-                // 文件监视失败不要影响主流程
-            }
+            catch { }
         }
 
         private void OnOrdersFileChanged(object sender, FileSystemEventArgs e)
         {
-            // FileSystemWatcher 的事件可能来自非 UI 线程，切换到 UI 线程处理定时器
             try
             {
-                if (this.IsHandleCreated)
+                if (IsHandleCreated)
                 {
-                    this.BeginInvoke(new Action(() =>
+                    BeginInvoke(new Action(() =>
                     {
                         try
                         {
@@ -87,23 +77,17 @@ namespace JewelryTool
             try
             {
                 _reloadTimer?.Stop();
-                // 重新读取磁盘并刷新显示（只有当窗体初始化完成时才刷新筛选，否则等 Load 时刷新）
                 ForceReloadAllDataFromDisk();
                 if (_formInitialized)
-                {
                     RefreshOrderListWithFilter();
-                }
             }
             catch { }
         }
 
         private void HistoryForm_Load(object sender, EventArgs e)
         {
-            // 绑定所有下拉框
             BindAllDropdownControls();
-            // 标记初始化完成
             _formInitialized = true;
-            // 首次加载显示全量单据
             RefreshOrderListWithFilter();
         }
 
@@ -134,25 +118,20 @@ namespace JewelryTool
             catch { }
         }
 
-        #region 核心：强制从磁盘读取最新数据，彻底杜绝缓存
-        /// <summary>
-        /// 【核心修复】每次调用都会清空所有旧数据，从磁盘重新读取最新的文件，确保数据100%是最新的
-        /// </summary>
+        #region 数据加载
         private void ForceReloadAllDataFromDisk()
         {
             try
             {
-                // 1. 彻底清空所有旧数据，杜绝缓存
                 _customerList.Clear();
                 _orderList.Clear();
 
-                // 2. 重新读取客户文件（用于下拉框）
                 if (File.Exists(CustomersFilePath))
                 {
                     string customerJson = File.ReadAllText(CustomersFilePath);
                     _customerList = JsonConvert.DeserializeObject<List<Customer>>(customerJson) ?? new List<Customer>();
                 }
-                // 兜底默认客户
+
                 if (_customerList.Count == 0)
                 {
                     _customerList = new List<Customer>
@@ -162,7 +141,6 @@ namespace JewelryTool
                     };
                 }
 
-                // 3. 重新读取单据文件（核心：确保新保存的单据能读到）
                 if (File.Exists(OrdersFilePath))
                 {
                     string orderJson = File.ReadAllText(OrdersFilePath);
@@ -171,91 +149,67 @@ namespace JewelryTool
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"读取最新数据失败：{ex.Message}", "数据加载错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"读取数据失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         #endregion
 
-        #region 下拉框绑定（修复：完整绑定所有筛选控件的事件）
-        /// <summary>
-        /// 绑定所有下拉框，同时绑定所有筛选条件的变化事件
-        /// </summary>
+        #region 下拉框绑定
         private void BindAllDropdownControls()
         {
-            // -------------------------- 筛选栏客户下拉框 --------------------------
-            // 先解绑事件，避免重复绑定
             cbFilterCustomer.SelectedIndexChanged -= OnFilterConditionChanged;
             cbFilterCustomer.DataSource = null;
 
-            // 构建带「全部客户」的列表
             var filterCustomerList = new List<Customer>
             {
                 new Customer { Id = 0, Name = "全部客户" }
             };
             filterCustomerList.AddRange(_customerList);
 
-            // 绑定数据
             cbFilterCustomer.DataSource = filterCustomerList;
             cbFilterCustomer.DisplayMember = nameof(Customer.Name);
             cbFilterCustomer.ValueMember = nameof(Customer.Id);
-            // 重新绑定事件
             cbFilterCustomer.SelectedIndexChanged += OnFilterConditionChanged;
 
-            // -------------------------- 筛选栏单据类型下拉框 --------------------------
             cbFilterType.SelectedIndexChanged -= OnFilterConditionChanged;
             cbFilterType.DataSource = null;
             cbFilterType.DataSource = new List<string> { "全部类型", "入库", "出库" };
             cbFilterType.SelectedIndexChanged += OnFilterConditionChanged;
 
-            // -------------------------- 【修复】日期控件事件绑定（之前漏了，导致改日期不刷新） --------------------------
             dtpStartDate.ValueChanged -= OnFilterConditionChanged;
             dtpEndDate.ValueChanged -= OnFilterConditionChanged;
-            // 日期默认值：最近30天
             dtpStartDate.Value = DateTime.Now.AddDays(-30).Date;
-            dtpEndDate.Value = DateTime.Now.Date.AddDays(1).AddSeconds(-1); // 包含今天的所有时间
-            // 绑定日期变化事件
+            dtpEndDate.Value = DateTime.Now.Date.AddDays(1).AddSeconds(-1);
             dtpStartDate.ValueChanged += OnFilterConditionChanged;
             dtpEndDate.ValueChanged += OnFilterConditionChanged;
 
-            // -------------------------- 编辑区客户下拉框 --------------------------
             cbEditCustomer.DataSource = null;
             cbEditCustomer.DataSource = _customerList;
             cbEditCustomer.DisplayMember = nameof(Customer.Name);
             cbEditCustomer.ValueMember = nameof(Customer.Id);
 
-            // -------------------------- 编辑区单据类型下拉框 --------------------------
             cbEditType.DataSource = null;
             cbEditType.DataSource = new List<string> { "入库", "出库" };
 
-            // -------------------------- 编辑区日期格式 --------------------------
             dtpEditDate.Format = DateTimePickerFormat.Custom;
             dtpEditDate.CustomFormat = "yyyy-MM-dd HH:mm";
         }
         #endregion
 
-        #region 筛选与列表显示（核心修复：筛选逻辑100%生效）
-        /// <summary>
-        /// 所有筛选条件变化时，都会触发这个方法，重新过滤并刷新列表
-        /// </summary>
+        #region 筛选与列表
         private void OnFilterConditionChanged(object sender, EventArgs e)
         {
-            // 窗体没初始化完成时，不执行筛选
             if (!_formInitialized) return;
             RefreshOrderListWithFilter();
         }
 
-        /// <summary>
-        /// 【核心修复】按筛选条件过滤单据，确保每个条件都生效
-        /// </summary>
         private void RefreshOrderListWithFilter()
         {
             try
             {
-                // 1. 获取所有筛选条件，增加空值防护
                 int filterCustomerId = 0;
                 string filterCustomerName = null;
 
-                // 优先通过 SelectedItem 获取 Customer 对象
                 if (cbFilterCustomer.SelectedItem is Customer selCust)
                 {
                     filterCustomerId = selCust.Id;
@@ -264,24 +218,21 @@ namespace JewelryTool
                 else if (cbFilterCustomer.SelectedValue != null && int.TryParse(cbFilterCustomer.SelectedValue.ToString(), out int custId))
                 {
                     filterCustomerId = custId;
-                    // 也尝试从本地客户列表找到对应名称
                     var found = _customerList.FirstOrDefault(c => c.Id == custId);
-                    if (found != null) filterCustomerName = found.Name;
+                    if (found != null)
+                        filterCustomerName = found.Name;
                 }
                 else if (cbFilterCustomer.SelectedItem != null)
                 {
-                    // 退回到显示文本匹配（防止绑定异常）
                     filterCustomerName = cbFilterCustomer.SelectedItem.ToString();
                 }
 
                 string filterOrderType = cbFilterType.SelectedItem?.ToString()?.Trim() ?? "全部类型";
                 DateTime filterStartDate = dtpStartDate.Value.Date;
-                DateTime filterEndDate = dtpEndDate.Value.Date.AddDays(1).AddSeconds(-1); // 结束日期包含当天23:59:59
+                DateTime filterEndDate = dtpEndDate.Value.Date.AddDays(1).AddSeconds(-1);
 
-                // 2. 【核心】多条件组合过滤，每个条件都严格判断
                 var filteredOrders = _orderList.Where(order =>
                 {
-                    // 客户筛选：优先使用 CustomerId；如果单据里没有保存 CustomerId（0），则尝试用 CustomerName 匹配
                     if (filterCustomerId != 0)
                     {
                         bool matchById = order.CustomerId == filterCustomerId;
@@ -290,12 +241,10 @@ namespace JewelryTool
                         {
                             matchByName = string.Equals(order.CustomerName.Trim(), filterCustomerName.Trim(), StringComparison.Ordinal);
                         }
-
                         if (!matchById && !matchByName)
                             return false;
                     }
 
-                    // 单据类型筛选：选了指定类型，就只显示该类型的单据，比较时去除空白并做空值防护
                     if (filterOrderType != "全部类型")
                     {
                         var ordType = order.OrderType?.Trim() ?? string.Empty;
@@ -303,38 +252,33 @@ namespace JewelryTool
                             return false;
                     }
 
-                    // 日期筛选：只显示日期范围内的单据
                     if (order.OrderDate < filterStartDate || order.OrderDate > filterEndDate)
                         return false;
 
-                    // 所有条件都满足
                     return true;
-                }).OrderByDescending(order => order.OrderDate).ToList(); // 最新的单据在最上面
+                }).OrderByDescending(order => order.OrderDate).ToList();
 
-                // 3. 直接显示单据里的原始数据，不做任何修改
                 var displayList = filteredOrders.Select((order, index) => new
                 {
                     行号 = index + 1,
                     单据ID = order.Id,
                     单据日期 = order.OrderDate.ToString("yyyy-MM-dd HH:mm"),
-                    客户名称 = order.CustomerName, // 直接用单据保存的原始名称，绝不修改
+                    客户名称 = order.CustomerName,
                     单据类型 = order.OrderType,
                     单据总额 = order.GrandTotal,
                     备注 = order.Remarks
                 }).ToList();
 
-                // 4. 刷新表格，彻底清空旧数据
                 dgvOrderList.SelectionChanged -= OnOrderSelectionChanged;
                 dgvOrderList.DataSource = null;
                 dgvOrderList.DataSource = displayList;
                 dgvOrderList.SelectionChanged += OnOrderSelectionChanged;
 
-                // 5. 格式化列
                 if (dgvOrderList.Columns.Contains("单据总额"))
                 {
                     dgvOrderList.Columns["单据总额"].DefaultCellStyle.Format = "F2";
                 }
-                // 固定列宽，避免显示错乱
+
                 dgvOrderList.Columns["行号"].Width = 60;
                 dgvOrderList.Columns["单据ID"].Width = 80;
                 dgvOrderList.Columns["单据日期"].Width = 160;
@@ -342,18 +286,14 @@ namespace JewelryTool
                 dgvOrderList.Columns["单据类型"].Width = 80;
                 dgvOrderList.Columns["单据总额"].Width = 120;
 
-                // 6. 清空明细和编辑区
                 ClearOrderDetailAndEditArea();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"刷新单据列表失败：{ex.Message}", "列表刷新错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"刷新列表失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        /// <summary>
-        /// 选中单据变化时，加载明细
-        /// </summary>
         private void OnOrderSelectionChanged(object sender, EventArgs e)
         {
             if (dgvOrderList.SelectedRows.Count == 0)
@@ -364,7 +304,6 @@ namespace JewelryTool
 
             try
             {
-                // 获取选中的单据ID
                 var orderIdCell = dgvOrderList.SelectedRows[0].Cells["单据ID"].Value;
                 if (orderIdCell == null || !int.TryParse(orderIdCell.ToString(), out int selectedOrderId))
                 {
@@ -372,7 +311,6 @@ namespace JewelryTool
                     return;
                 }
 
-                // 找到对应的单据
                 _currentSelectedOrder = _orderList.FirstOrDefault(o => o.Id == selectedOrderId);
                 if (_currentSelectedOrder == null)
                 {
@@ -380,19 +318,15 @@ namespace JewelryTool
                     return;
                 }
 
-                // 加载明细和编辑区
                 LoadOrderDetailToGrid(_currentSelectedOrder);
                 FillEditAreaWithOrderData(_currentSelectedOrder);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"加载单据明细失败：{ex.Message}", "明细加载错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"加载明细失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        /// <summary>
-        /// 加载单据明细到表格
-        /// </summary>
         private void LoadOrderDetailToGrid(Order order)
         {
             if (order?.Items == null)
@@ -416,11 +350,10 @@ namespace JewelryTool
             dgvOrderDetail.DataSource = null;
             dgvOrderDetail.DataSource = detailList;
 
-            // 格式化数字列
             foreach (DataGridViewColumn col in dgvOrderDetail.Columns)
             {
-                // 确保列的 Name 与 HeaderText 一致，方便通过列名访问单元格
-                if (string.IsNullOrEmpty(col.Name)) col.Name = col.HeaderText;
+                if (string.IsNullOrEmpty(col.Name))
+                    col.Name = col.HeaderText;
 
                 if (col.Name != "序号" && col.Name != "品名")
                 {
@@ -429,9 +362,6 @@ namespace JewelryTool
             }
         }
 
-        /// <summary>
-        /// 回填单据信息到编辑区
-        /// </summary>
         private void FillEditAreaWithOrderData(Order order)
         {
             txtEditOrderId.Text = order.Id.ToString();
@@ -441,9 +371,6 @@ namespace JewelryTool
             txtEditRemarks.Text = order.Remarks;
         }
 
-        /// <summary>
-        /// 清空明细和编辑区
-        /// </summary>
         private void ClearOrderDetailAndEditArea()
         {
             _currentSelectedOrder = null;
@@ -454,60 +381,45 @@ namespace JewelryTool
         #endregion
 
         #region 按钮事件
-        /// <summary>
-        /// 刷新按钮：强制重新读取磁盘最新数据，刷新列表
-        /// </summary>
         private void BtnRefresh_Click(object sender, EventArgs e)
         {
-            // 强制重新读最新文件
             ForceReloadAllDataFromDisk();
-            // 重新绑定下拉框（新增的客户也会同步）
             BindAllDropdownControls();
-            // 刷新列表
             RefreshOrderListWithFilter();
-            MessageBox.Show("已强制刷新所有最新数据，新单据、新客户已同步！", "刷新完成", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("数据已刷新", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        /// <summary>
-        /// 保存修改后的单据
-        /// </summary>
         private void BtnSaveEdit_Click(object sender, EventArgs e)
         {
             if (_currentSelectedOrder == null)
             {
-                MessageBox.Show("请先选择要修改的单据", "操作提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("请选择要修改的单据", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            if (MessageBox.Show("确定要修改该单据吗？修改后将覆盖原数据，不可恢复！", "确认修改", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
-            {
+            if (MessageBox.Show("确定修改？修改后无法恢复", "确认", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                 return;
-            }
 
             try
             {
                 var selectedCustomer = cbEditCustomer.SelectedItem as Customer;
                 if (selectedCustomer == null)
                 {
-                    MessageBox.Show("请选择有效的客户", "操作提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("请选择客户", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
-                // 更新单据信息
                 _currentSelectedOrder.CustomerId = selectedCustomer.Id;
                 _currentSelectedOrder.CustomerName = selectedCustomer.Name;
                 _currentSelectedOrder.OrderDate = dtpEditDate.Value;
                 _currentSelectedOrder.OrderType = cbEditType.SelectedItem?.ToString() ?? "入库";
                 _currentSelectedOrder.Remarks = txtEditRemarks.Text;
 
-                // 更新明细数据
                 var newItemList = new List<OrderItem>();
                 foreach (DataGridViewRow row in dgvOrderDetail.Rows)
                 {
-                    // 跳过新建行
                     if (row.IsNewRow) continue;
 
-                    // 逐项安全解析，尽量避免异常
                     int itemId = 0;
                     if (row.Cells["序号"].Value != null && int.TryParse(row.Cells["序号"].Value.ToString(), out int parsedId))
                         itemId = parsedId;
@@ -521,8 +433,8 @@ namespace JewelryTool
                     decimal discountedPrice = TryParseDecimalCell(row, "成色折价");
                     decimal totalPrice = TryParseDecimalCell(row, "单项总价");
 
-                    // 如果 id 无效，使用当前列表长度+1 作为临时 id（保持非负）
-                    if (itemId <= 0) itemId = newItemList.Count + 1;
+                    if (itemId <= 0)
+                        itemId = newItemList.Count + 1;
 
                     newItemList.Add(new OrderItem
                     {
@@ -536,82 +448,62 @@ namespace JewelryTool
                         TotalPrice = totalPrice
                     });
                 }
+
                 _currentSelectedOrder.Items = newItemList;
                 _currentSelectedOrder.GrandTotal = newItemList.Sum(item => item.TotalPrice);
-
-                // 保存到JSON文件
                 SaveOrdersToFile();
 
-                // 刷新数据和列表
                 ForceReloadAllDataFromDisk();
                 RefreshOrderListWithFilter();
 
-                MessageBox.Show("单据修改成功，数据已保存！", "操作成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("修改成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"修改单据失败：{ex.Message}", "操作错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"修改失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        /// <summary>
-        /// 删除选中的单据
-        /// </summary>
         private void BtnDeleteOrder_Click(object sender, EventArgs e)
         {
             if (_currentSelectedOrder == null)
             {
-                MessageBox.Show("请先选择要删除的单据", "操作提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("请选择要删除的单据", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            if (MessageBox.Show($"确定要删除单据号【{_currentSelectedOrder.Id}】吗？删除后数据不可恢复！", "确认删除", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
-            {
+            if (MessageBox.Show($"确定删除单据【{_currentSelectedOrder.Id}】？删除后无法恢复", "确认删除", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
                 return;
-            }
 
             try
             {
                 _orderList.Remove(_currentSelectedOrder);
                 SaveOrdersToFile();
-
-                // 刷新列表
                 ForceReloadAllDataFromDisk();
                 RefreshOrderListWithFilter();
-
-                MessageBox.Show("单据已成功删除！", "操作成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("删除成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"删除单据失败：{ex.Message}", "操作错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"删除失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        /// <summary>
-        /// 把选中的单据调取到主界面
-        /// </summary>
         private void BtnLoadToMain_Click(object sender, EventArgs e)
         {
             if (_currentSelectedOrder == null)
             {
-                MessageBox.Show("请先选择要调取的单据", "操作提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("请选择要调取的单据", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            if (MessageBox.Show("确定要把该单据调取到主界面吗？主界面当前未保存的数据会被清空！", "确认调取", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
-            {
+            if (MessageBox.Show("确定调取到主界面？当前未保存数据将清空", "确认调取", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                 return;
-            }
 
-            // 调用主窗体的方法回填数据
             _mainFormInstance?.LoadOrderToMainForm(_currentSelectedOrder);
-            // 关闭当前窗体
-            this.Close();
+            Close();
         }
 
-        /// <summary>
-        /// 明细单元格编辑后，自动重新计算金额
-        /// </summary>
         private void DgvOrderDetail_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0) return;
@@ -619,7 +511,6 @@ namespace JewelryTool
 
             try
             {
-                // 重新计算成色折价
                 if (decimal.TryParse(currentRow.Cells["成色"].Value?.ToString(), out decimal purity)
                     && decimal.TryParse(currentRow.Cells["单价"].Value?.ToString(), out decimal unitPrice))
                 {
@@ -627,70 +518,44 @@ namespace JewelryTool
                     currentRow.Cells["成色折价"].Value = Math.Truncate(discountPrice * 10) / 10;
                 }
 
-                // 重新计算单项总价
                 if (decimal.TryParse(currentRow.Cells["净重量"].Value?.ToString(), out decimal netWeight)
                     && decimal.TryParse(currentRow.Cells["成色折价"].Value?.ToString(), out decimal finalDiscountPrice))
                 {
                     currentRow.Cells["单项总价"].Value = netWeight * finalDiscountPrice;
                 }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"金额计算失败：{ex.Message}", "计算错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            catch { }
         }
         #endregion
 
         #region 辅助方法
-
-        /// <summary>
-        /// 从 DataGridViewRow 的指定列安全解析 decimal 值，解析失败返回 0
-        /// </summary>
         private decimal TryParseDecimalCell(DataGridViewRow row, string columnName)
         {
             if (row == null) return 0m;
             try
             {
-                object cellVal = null;
-                try
-                {
-                    cellVal = row.Cells[columnName].Value;
-                }
-                catch
-                {
-                    // 列名不存在或访问出错
-                    return 0m;
-                }
-
+                object cellVal = row.Cells[columnName].Value;
                 if (cellVal == null) return 0m;
-                if (decimal.TryParse(cellVal.ToString(), out decimal result)) return result;
+                if (decimal.TryParse(cellVal.ToString(), out decimal result))
+                    return result;
             }
-            catch
-            {
-                // 忽略解析异常，返回 0
-            }
-
+            catch { }
             return 0m;
         }
 
-        /// <summary>
-        /// 把单据列表保存到JSON文件
-        /// </summary>
         private void SaveOrdersToFile()
         {
             try
             {
                 if (!Directory.Exists(DataFolder))
-                {
                     Directory.CreateDirectory(DataFolder);
-                }
 
                 string json = JsonConvert.SerializeObject(_orderList, Formatting.Indented);
                 File.WriteAllText(OrdersFilePath, json);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"保存单据数据到文件失败：{ex.Message}", "保存错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"保存失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         #endregion
