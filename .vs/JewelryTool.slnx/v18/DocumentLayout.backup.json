@@ -3,24 +3,24 @@
   "WorkspaceRootPath": "C:\\EXE\\JewelryTool\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|c:\\exe\\jewelrytool\\printsettingform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|solutionrelative:printsettingform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|c:\\exe\\jewelrytool\\printsettingform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|solutionrelative:printsettingform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|C:\\EXE\\JewelryTool\\historyform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|solutionrelative:historyform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|C:\\EXE\\JewelryTool\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|solutionrelative:mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|c:\\exe\\jewelrytool\\historyform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|solutionrelative:historyform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|c:\\exe\\jewelrytool\\printsettingform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|solutionrelative:printsettingform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|C:\\EXE\\JewelryTool\\historyform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|solutionrelative:historyform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|C:\\EXE\\JewelryTool\\printsettingform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|solutionrelative:printsettingform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|C:\\EXE\\JewelryTool\\historyform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|solutionrelative:historyform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{9F62840A-022F-45C5-90A2-DE1ACEBE8ECE}|JewelryTool.csproj|C:\\EXE\\JewelryTool\\statsform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -42,7 +42,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 7,
           "Children": [
             {
               "$type": "Bookmark",
@@ -62,7 +62,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "PrintSettingForm.cs",
               "DocumentMoniker": "C:\\EXE\\JewelryTool\\PrintSettingForm.cs",
               "RelativeDocumentMoniker": "PrintSettingForm.cs",
@@ -70,12 +70,11 @@
               "RelativeToolTip": "PrintSettingForm.cs",
               "ViewState": "AgIAAK0AAAAAAAAAAAAiwMoAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-18T05:47:42.957Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-18T05:47:42.957Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "PrintSettingForm.Designer.cs",
               "DocumentMoniker": "C:\\EXE\\JewelryTool\\PrintSettingForm.Designer.cs",
               "RelativeDocumentMoniker": "PrintSettingForm.Designer.cs",
@@ -88,7 +87,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "HistoryForm.Designer.cs",
               "DocumentMoniker": "C:\\EXE\\JewelryTool\\HistoryForm.Designer.cs",
               "RelativeDocumentMoniker": "HistoryForm.Designer.cs",
@@ -96,18 +95,17 @@
               "RelativeToolTip": "HistoryForm.Designer.cs",
               "ViewState": "AgIAAEoBAAAAAAAAAAAAwGABAAA8AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-13T03:40:16.153Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-13T03:40:16.153Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 0,
               "Title": "HistoryForm.cs",
               "DocumentMoniker": "C:\\EXE\\JewelryTool\\HistoryForm.cs",
               "RelativeDocumentMoniker": "HistoryForm.cs",
               "ToolTip": "C:\\EXE\\JewelryTool\\HistoryForm.cs",
               "RelativeToolTip": "HistoryForm.cs",
-              "ViewState": "AgIAAPYBAAAAAAAAAAAuwBUCAAAnAAAAAAAAAA==",
+              "ViewState": "AgIAAAICAAAAAAAAAAAswDsCAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-13T03:39:45.672Z",
               "EditorCaption": ""
@@ -122,8 +120,7 @@
               "RelativeToolTip": "StatsForm.cs",
               "ViewState": "AgIAAEMAAAAAAAAAAAAAAGMAAAA/AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-12T10:03:41.856Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-12T10:03:41.856Z"
             },
             {
               "$type": "Document",
@@ -135,8 +132,7 @@
               "RelativeToolTip": "StatsForm.Designer.cs",
               "ViewState": "AgIAAJkAAAAAAAAAAADwv8IAAAA1AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-12T10:03:16.463Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-12T10:03:16.463Z"
             },
             {
               "$type": "Document",
@@ -148,18 +144,17 @@
               "RelativeToolTip": "MainForm.Designer.cs",
               "ViewState": "AgIAAOMAAAAAAAAAAADwv/wAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-12T09:03:14.899Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-12T09:03:14.899Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "MainForm.cs",
               "DocumentMoniker": "C:\\EXE\\JewelryTool\\MainForm.cs",
               "RelativeDocumentMoniker": "MainForm.cs",
               "ToolTip": "C:\\EXE\\JewelryTool\\MainForm.cs",
               "RelativeToolTip": "MainForm.cs",
-              "ViewState": "AgIAAFQCAAAAAAAAAAAuwGcCAAARAAAAAAAAAA==",
+              "ViewState": "AgIAAAwDAAAAAAAAAAAAAEYDAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-12T08:35:51.521Z",
               "EditorCaption": ""

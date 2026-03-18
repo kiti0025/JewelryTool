@@ -338,10 +338,6 @@ namespace JewelryTool
                                 column.Width = newWidth;
                             }
                         }
-
-                        // 调整表格整体大小（可选，如果需要表格区域也缩放）
-                        // dgv.Height = (int)(dgv.Height * scale);
-                        // dgv.Width = (int)(dgv.Width * scale);
                     }
                 }
             }
@@ -410,12 +406,13 @@ namespace JewelryTool
                 currentRow.Cells[colDiscountedPrice.Name].Value = Math.Truncate(discountPrice * 10) / 10;
             }
 
-            // 单项总价
+            // 单项总价 → 【核心修改】截断小数，只保留整数
             decimal netWeight = 0, finalDiscountPrice = 0;
             if (decimal.TryParse(currentRow.Cells[colNetWeight.Name].Value?.ToString(), out netWeight)
                 && decimal.TryParse(currentRow.Cells[colDiscountedPrice.Name].Value?.ToString(), out finalDiscountPrice))
             {
-                currentRow.Cells[colTotalPrice.Name].Value = netWeight * finalDiscountPrice;
+                decimal itemTotal = netWeight * finalDiscountPrice;
+                currentRow.Cells[colTotalPrice.Name].Value = (int)Math.Truncate(itemTotal);
             }
 
             UpdateTotalPrice();
@@ -423,15 +420,16 @@ namespace JewelryTool
 
         public void UpdateTotalPrice()
         {
-            decimal total = 0;
+            int total = 0;
             foreach (DataGridViewRow row in dgvItems.Rows)
             {
-                if (decimal.TryParse(row.Cells[colTotalPrice.Name].Value?.ToString(), out decimal itemTotal))
+                if (int.TryParse(row.Cells[colTotalPrice.Name].Value?.ToString(), out int itemTotal))
                 {
                     total += itemTotal;
                 }
             }
-            lblTotal.Text = $"单据总价：{total:F2} 元";
+            // 【核心修改】显示纯整数，无小数
+            lblTotal.Text = $"单据总价：{total} 元";
         }
         #endregion
 
@@ -453,8 +451,9 @@ namespace JewelryTool
                     return;
                 }
 
-                decimal grandTotal = 0;
-                decimal.TryParse(lblTotal.Text.Replace("单据总价：", "").Replace("元", "").Trim(), out grandTotal);
+                // 【核心修改】总额取整数
+                int grandTotal = 0;
+                int.TryParse(lblTotal.Text.Replace("单据总价：", "").Replace("元", "").Trim(), out grandTotal);
 
                 int newOrderId = orders.Count > 0 ? orders.Max(o => o.Id) + 1 : 1;
                 Order newOrder = new Order
@@ -482,7 +481,8 @@ namespace JewelryTool
                         Purity = Convert.ToDecimal(row.Cells[colPurity.Name].Value ?? 1),
                         UnitPrice = Convert.ToDecimal(row.Cells[colUnitPrice.Name].Value ?? 0),
                         DiscountedPrice = Convert.ToDecimal(row.Cells[colDiscountedPrice.Name].Value ?? 0),
-                        TotalPrice = Convert.ToDecimal(row.Cells[colTotalPrice.Name].Value ?? 0)
+                        // 【核心修改】保存整数单项总价
+                        TotalPrice = Convert.ToInt32(row.Cells[colTotalPrice.Name].Value ?? 0)
                     });
                 }
 
@@ -787,6 +787,7 @@ namespace JewelryTool
                 row.Cells[colPurity.Name].Value = item.Purity;
                 row.Cells[colUnitPrice.Name].Value = item.UnitPrice;
                 row.Cells[colDiscountedPrice.Name].Value = item.DiscountedPrice;
+                // 【核心修改】赋值整数，无小数
                 row.Cells[colTotalPrice.Name].Value = item.TotalPrice;
             }
 
@@ -815,7 +816,8 @@ namespace JewelryTool
         public string CustomerName { get; set; }
         public DateTime OrderDate { get; set; }
         public string OrderType { get; set; }
-        public decimal GrandTotal { get; set; }
+        // 【核心修改】单据总价改为整型
+        public int GrandTotal { get; set; }
         public string Remarks { get; set; }
         public List<OrderItem> Items { get; set; }
     }
@@ -830,7 +832,8 @@ namespace JewelryTool
         public decimal Purity { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal DiscountedPrice { get; set; }
-        public decimal TotalPrice { get; set; }
+        // 【核心修改】单项总价改为整型
+        public int TotalPrice { get; set; }
     }
     #endregion
 }

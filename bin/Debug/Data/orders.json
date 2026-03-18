@@ -3,9 +3,9 @@
     "Id": 1,
     "CustomerId": 1,
     "CustomerName": "零售客户",
-    "OrderDate": "2026-03-18T10:56:25.1027585+08:00",
+    "OrderDate": "2026-03-18T15:23:49.607786+08:00",
     "OrderType": "入库",
-    "GrandTotal": 9960.00,
+    "GrandTotal": 1000,
     "Remarks": "",
     "Items": [
       {
@@ -13,88 +13,33 @@
         "ProductId": 1,
         "ProductName": "黄金",
         "GrossWeight": 100.0,
-        "NetWeight": 99.0,
+        "NetWeight": 100.0,
         "Purity": 1.0,
         "UnitPrice": 10.0,
         "DiscountedPrice": 10.0,
-        "TotalPrice": 990.0
-      },
-      {
-        "Id": 2,
-        "ProductId": 1,
-        "ProductName": "黄金",
-        "GrossWeight": 200.0,
-        "NetWeight": 199.0,
-        "Purity": 1.0,
-        "UnitPrice": 10.0,
-        "DiscountedPrice": 10.0,
-        "TotalPrice": 1990.0
-      },
-      {
-        "Id": 3,
-        "ProductId": 1,
-        "ProductName": "黄金",
-        "GrossWeight": 300.0,
-        "NetWeight": 299.0,
-        "Purity": 1.0,
-        "UnitPrice": 10.0,
-        "DiscountedPrice": 10.0,
-        "TotalPrice": 2990.0
-      },
-      {
-        "Id": 4,
-        "ProductId": 1,
-        "ProductName": "黄金",
-        "GrossWeight": 400.0,
-        "NetWeight": 399.0,
-        "Purity": 1.0,
-        "UnitPrice": 10.0,
-        "DiscountedPrice": 10.0,
-        "TotalPrice": 3990.0
+        "TotalPrice": 1000
       }
     ]
   },
   {
     "Id": 2,
-    "CustomerId": 1,
-    "CustomerName": "零售客户",
-    "OrderDate": "2026-03-18T11:13:39.6192409+08:00",
+    "CustomerId": 2,
+    "CustomerName": "合作门店",
+    "OrderDate": "2026-03-18T15:24:15.196509+08:00",
     "OrderType": "入库",
-    "GrandTotal": 4990.00,
+    "GrandTotal": 960,
     "Remarks": "",
     "Items": [
       {
         "Id": 1,
-        "ProductId": 3,
-        "ProductName": "22k",
-        "GrossWeight": 500.0,
-        "NetWeight": 499.0,
-        "Purity": 1.0,
-        "UnitPrice": 10.0,
-        "DiscountedPrice": 10.0,
-        "TotalPrice": 4990.0
-      }
-    ]
-  },
-  {
-    "Id": 3,
-    "CustomerId": 1,
-    "CustomerName": "零售客户",
-    "OrderDate": "2026-03-18T11:13:39.6192409+08:00",
-    "OrderType": "入库",
-    "GrandTotal": 8990.00,
-    "Remarks": "",
-    "Items": [
-      {
-        "Id": 1,
-        "ProductId": 7,
-        "ProductName": "pd990",
-        "GrossWeight": 900.0,
-        "NetWeight": 899.0,
-        "Purity": 1.0,
-        "UnitPrice": 10.0,
-        "DiscountedPrice": 10.0,
-        "TotalPrice": 8990.0
+        "ProductId": 1,
+        "ProductName": "黄金",
+        "GrossWeight": 99.0,
+        "NetWeight": 98.0,
+        "Purity": 0.9,
+        "UnitPrice": 10.99,
+        "DiscountedPrice": 9.8,
+        "TotalPrice": 960
       }
     ]
   }

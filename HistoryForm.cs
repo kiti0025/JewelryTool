@@ -274,9 +274,10 @@ namespace JewelryTool
                 dgvOrderList.DataSource = displayList;
                 dgvOrderList.SelectionChanged += OnOrderSelectionChanged;
 
+                // 移除单据总额的小数格式（改为整数）
                 if (dgvOrderList.Columns.Contains("单据总额"))
                 {
-                    dgvOrderList.Columns["单据总额"].DefaultCellStyle.Format = "F2";
+                    dgvOrderList.Columns["单据总额"].DefaultCellStyle.Format = "";
                 }
 
                 dgvOrderList.Columns["行号"].Width = 60;
@@ -355,9 +356,14 @@ namespace JewelryTool
                 if (string.IsNullOrEmpty(col.Name))
                     col.Name = col.HeaderText;
 
-                if (col.Name != "序号" && col.Name != "品名")
+                // 仅重量/单价保留小数，单项总价移除小数格式
+                if (col.Name != "序号" && col.Name != "品名" && col.Name != "单项总价")
                 {
                     col.DefaultCellStyle.Format = "F2";
+                }
+                else
+                {
+                    col.DefaultCellStyle.Format = "";
                 }
             }
         }
@@ -431,7 +437,8 @@ namespace JewelryTool
                     decimal purity = TryParseDecimalCell(row, "成色");
                     decimal unitPrice = TryParseDecimalCell(row, "单价");
                     decimal discountedPrice = TryParseDecimalCell(row, "成色折价");
-                    decimal totalPrice = TryParseDecimalCell(row, "单项总价");
+                    // 核心修改：单项总价转为整数（截断小数）
+                    int totalPrice = (int)Math.Truncate(TryParseDecimalCell(row, "单项总价"));
 
                     if (itemId <= 0)
                         itemId = newItemList.Count + 1;
@@ -521,7 +528,9 @@ namespace JewelryTool
                 if (decimal.TryParse(currentRow.Cells["净重量"].Value?.ToString(), out decimal netWeight)
                     && decimal.TryParse(currentRow.Cells["成色折价"].Value?.ToString(), out decimal finalDiscountPrice))
                 {
-                    currentRow.Cells["单项总价"].Value = netWeight * finalDiscountPrice;
+                    // 核心修改：单项总价计算后截断小数，赋值整数
+                    decimal itemTotal = netWeight * finalDiscountPrice;
+                    currentRow.Cells["单项总价"].Value = (int)Math.Truncate(itemTotal);
                 }
             }
             catch { }
