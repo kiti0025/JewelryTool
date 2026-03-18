@@ -95,7 +95,9 @@ namespace JewelryTool
             tiers.Add(new { Min = 5000m, Max = decimal.MaxValue, Name = "5000克以上" });
 
             var stats = from tier in tiers
-                        let inItems = orders.Where(o => o.OrderType == "入库").SelectMany(o => o.Items)
+                        let inItems = orders.Where(o => o.OrderType == "入库")
+                   .SelectMany(o => o.Items)
+                   .Where(x => x.ProductName == "黄金")  // 只统计黄金
                         let tierItems = inItems.Where(x => x.NetWeight >= tier.Min && x.NetWeight < tier.Max)
                         select new
                         {

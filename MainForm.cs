@@ -277,13 +277,111 @@ namespace JewelryTool
         private void CbZoom_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cbZoom.SelectedItem == null) return;
-
             string zoomText = cbZoom.SelectedItem.ToString().Replace("%", "");
             if (decimal.TryParse(zoomText, out decimal zoomRate))
             {
                 float scale = (float)(zoomRate / 100m);
-                this.AutoScaleMode = AutoScaleMode.Font;
-                this.Scale(new SizeF(scale, scale));
+                // 只缩放中间的数据表格（dgvItems）
+                ScaleDataGridView(dgvItems, scale);
+            }
+        }
+
+        private void ScaleDataGridView(DataGridView dgv, float scale)
+        {
+            if (dgv == null) return;
+
+            // 保存原始字体大小（如果是第一次缩放）
+            if (!dgv.Tag?.ToString().StartsWith("OriginalFontSize:") ?? true)
+            {
+                float originalSize = dgv.Font?.Size ?? 9f;
+                dgv.Tag = $"OriginalFontSize:{originalSize}";
+            }
+
+            // 解析原始字体大小
+            string tagStr = dgv.Tag?.ToString() ?? "";
+            if (tagStr.StartsWith("OriginalFontSize:"))
+            {
+                if (float.TryParse(tagStr.Replace("OriginalFontSize:", ""), out float originalSize))
+                {
+                    // 计算新的字体大小
+                    float newSize = originalSize * scale;
+                    if (newSize >= 6 && newSize <= 36)
+                    {
+                        // 缩放表格字体
+                        dgv.Font = new Font(dgv.Font.FontFamily, newSize, dgv.Font.Style);
+
+                        // 缩放列标题字体
+                        foreach (DataGridViewColumn column in dgv.Columns)
+                        {
+                            if (column.HeaderCell.Style.Font != null)
+                            {
+                                column.HeaderCell.Style.Font = new Font(
+                                    column.HeaderCell.Style.Font.FontFamily,
+                                    newSize,
+                                    column.HeaderCell.Style.Font.Style);
+                            }
+                        }
+
+                        // 缩放行高（根据字体大小调整）
+                        int newRowHeight = (int)(dgv.RowTemplate.Height * scale);
+                        if (newRowHeight >= 20 && newRowHeight <= 80)
+                        {
+                            dgv.RowTemplate.Height = newRowHeight;
+                        }
+
+                        // 缩放列宽（根据字体大小调整）
+                        foreach (DataGridViewColumn column in dgv.Columns)
+                        {
+                            int newWidth = (int)(column.Width * scale);
+                            if (newWidth >= 30 && newWidth <= 300)
+                            {
+                                column.Width = newWidth;
+                            }
+                        }
+
+                        // 调整表格整体大小（可选，如果需要表格区域也缩放）
+                        // dgv.Height = (int)(dgv.Height * scale);
+                        // dgv.Width = (int)(dgv.Width * scale);
+                    }
+                }
+            }
+        }
+
+        private void ScaleFonts(Control control, float scale)
+        {
+            // 缩放当前控件的字体
+            if (control.Font != null)
+            {
+                float newSize = control.Font.Size * scale;
+                if (newSize > 6 && newSize < 36) // 限制字体大小范围
+                {
+                    control.Font = new Font(control.Font.FontFamily, newSize, control.Font.Style);
+                }
+            }
+
+            // 递归缩放子控件
+            foreach (Control child in control.Controls)
+            {
+                ScaleFonts(child, scale);
+            }
+
+            // 特殊处理DataGridView的列标题字体
+            if (control is DataGridView dgv)
+            {
+                foreach (DataGridViewColumn column in dgv.Columns)
+                {
+                    if (column.HeaderCell.Style.Font != null)
+                    {
+                        float newSize = column.HeaderCell.Style.Font.Size * scale;
+                        if (newSize > 6 && newSize < 36)
+                        {
+                            column.HeaderCell.Style.Font = new Font(
+                                column.HeaderCell.Style.Font.FontFamily,
+                                newSize,
+                                column.HeaderCell.Style.Font.Style);
+                        }
+                    }
+                }
             }
         }
 

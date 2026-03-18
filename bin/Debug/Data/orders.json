@@ -1,155 +1,100 @@
 [
   {
     "Id": 1,
-    "CustomerId": 2,
-    "CustomerName": "合作门店",
-    "OrderDate": "2026-03-13T14:24:16.2281125+08:00",
+    "CustomerId": 1,
+    "CustomerName": "零售客户",
+    "OrderDate": "2026-03-18T10:56:25.1027585+08:00",
     "OrderType": "入库",
-    "GrandTotal": 1.00,
-    "Remarks": "1",
+    "GrandTotal": 9960.00,
+    "Remarks": "",
     "Items": [
       {
         "Id": 1,
-        "ProductId": 2,
-        "ProductName": "18k",
-        "GrossWeight": 1.0,
-        "NetWeight": 1.0,
+        "ProductId": 1,
+        "ProductName": "黄金",
+        "GrossWeight": 100.0,
+        "NetWeight": 99.0,
         "Purity": 1.0,
-        "UnitPrice": 1.0,
-        "DiscountedPrice": 1.0,
-        "TotalPrice": 1.0
+        "UnitPrice": 10.0,
+        "DiscountedPrice": 10.0,
+        "TotalPrice": 990.0
+      },
+      {
+        "Id": 2,
+        "ProductId": 1,
+        "ProductName": "黄金",
+        "GrossWeight": 200.0,
+        "NetWeight": 199.0,
+        "Purity": 1.0,
+        "UnitPrice": 10.0,
+        "DiscountedPrice": 10.0,
+        "TotalPrice": 1990.0
+      },
+      {
+        "Id": 3,
+        "ProductId": 1,
+        "ProductName": "黄金",
+        "GrossWeight": 300.0,
+        "NetWeight": 299.0,
+        "Purity": 1.0,
+        "UnitPrice": 10.0,
+        "DiscountedPrice": 10.0,
+        "TotalPrice": 2990.0
+      },
+      {
+        "Id": 4,
+        "ProductId": 1,
+        "ProductName": "黄金",
+        "GrossWeight": 400.0,
+        "NetWeight": 399.0,
+        "Purity": 1.0,
+        "UnitPrice": 10.0,
+        "DiscountedPrice": 10.0,
+        "TotalPrice": 3990.0
       }
     ]
   },
   {
     "Id": 2,
-    "CustomerId": 3,
-    "CustomerName": "2",
-    "OrderDate": "2026-03-13T14:24:41.653128+08:00",
+    "CustomerId": 1,
+    "CustomerName": "零售客户",
+    "OrderDate": "2026-03-18T11:13:39.6192409+08:00",
     "OrderType": "入库",
-    "GrandTotal": 4.00,
-    "Remarks": "2",
+    "GrandTotal": 4990.00,
+    "Remarks": "",
     "Items": [
       {
         "Id": 1,
-        "ProductId": 8,
-        "ProductName": "2",
-        "GrossWeight": 2.0,
-        "NetWeight": 2.0,
+        "ProductId": 3,
+        "ProductName": "22k",
+        "GrossWeight": 500.0,
+        "NetWeight": 499.0,
         "Purity": 1.0,
-        "UnitPrice": 2.0,
-        "DiscountedPrice": 2.0,
-        "TotalPrice": 4.0
+        "UnitPrice": 10.0,
+        "DiscountedPrice": 10.0,
+        "TotalPrice": 4990.0
       }
     ]
   },
   {
     "Id": 3,
-    "CustomerId": 3,
-    "CustomerName": "2",
-    "OrderDate": "2026-03-13T14:25:17.7349124+08:00",
-    "OrderType": "出库",
-    "GrandTotal": 9.00,
-    "Remarks": "3",
-    "Items": [
-      {
-        "Id": 1,
-        "ProductId": 8,
-        "ProductName": "2",
-        "GrossWeight": 3.0,
-        "NetWeight": 3.0,
-        "Purity": 1.0,
-        "UnitPrice": 3.0,
-        "DiscountedPrice": 3.0,
-        "TotalPrice": 9.0
-      }
-    ]
-  },
-  {
-    "Id": 4,
-    "CustomerId": 3,
-    "CustomerName": "2",
-    "OrderDate": "2026-03-13T14:25:39.5463996+08:00",
-    "OrderType": "入库",
-    "GrandTotal": 16.00,
-    "Remarks": "4",
-    "Items": [
-      {
-        "Id": 1,
-        "ProductId": 0,
-        "ProductName": "",
-        "GrossWeight": 4.0,
-        "NetWeight": 4.0,
-        "Purity": 1.0,
-        "UnitPrice": 4.0,
-        "DiscountedPrice": 4.0,
-        "TotalPrice": 16.0
-      }
-    ]
-  },
-  {
-    "Id": 5,
-    "CustomerId": 3,
-    "CustomerName": "2",
-    "OrderDate": "2026-03-13T14:25:59.3667085+08:00",
-    "OrderType": "出库",
-    "GrandTotal": 25.00,
-    "Remarks": "5",
-    "Items": [
-      {
-        "Id": 1,
-        "ProductId": 8,
-        "ProductName": "2",
-        "GrossWeight": 5.0,
-        "NetWeight": 5.0,
-        "Purity": 1.0,
-        "UnitPrice": 5.0,
-        "DiscountedPrice": 5.0,
-        "TotalPrice": 25.0
-      }
-    ]
-  },
-  {
-    "Id": 6,
     "CustomerId": 1,
     "CustomerName": "零售客户",
-    "OrderDate": "2026-03-13T14:29:11.955792+08:00",
+    "OrderDate": "2026-03-18T11:13:39.6192409+08:00",
     "OrderType": "入库",
-    "GrandTotal": 25.00,
-    "Remarks": "5",
+    "GrandTotal": 8990.00,
+    "Remarks": "",
     "Items": [
       {
         "Id": 1,
-        "ProductId": 9,
-        "ProductName": "Test",
-        "GrossWeight": 5.0,
-        "NetWeight": 5.0,
+        "ProductId": 7,
+        "ProductName": "pd990",
+        "GrossWeight": 900.0,
+        "NetWeight": 899.0,
         "Purity": 1.0,
-        "UnitPrice": 5.0,
-        "DiscountedPrice": 5.0,
-        "TotalPrice": 25.0
-      }
-    ]
-  },
-  {
-    "Id": 7,
-    "CustomerId": 4,
-    "CustomerName": "Test",
-    "OrderDate": "2026-03-13T14:29:51.7254715+08:00",
-    "OrderType": "出库",
-    "GrandTotal": 4356.00,
-    "Remarks": "66",
-    "Items": [
-      {
-        "Id": 1,
-        "ProductId": 9,
-        "ProductName": "Test",
-        "GrossWeight": 66.0,
-        "NetWeight": 66.0,
-        "Purity": 1.0,
-        "UnitPrice": 66.0,
-        "DiscountedPrice": 66.0,
-        "TotalPrice": 4356.0
+        "UnitPrice": 10.0,
+        "DiscountedPrice": 10.0,
+        "TotalPrice": 8990.0
       }
     ]
   }

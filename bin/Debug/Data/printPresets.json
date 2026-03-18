@@ -1,0 +1,17 @@
+[
+  {
+    "PresetName": "二联打印纸(241×140mm)",
+    "PaperWidth": 241.0,
+    "PaperHeight": 139.7
+  },
+  {
+    "PresetName": "A4(210×297mm)",
+    "PaperWidth": 210.0,
+    "PaperHeight": 297.0
+  },
+  {
+    "PresetName": "A5(148×210mm)",
+    "PaperWidth": 148.0,
+    "PaperHeight": 210.0
+  }
+]
