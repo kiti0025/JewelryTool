@@ -3,9 +3,9 @@
     "Id": 1,
     "CustomerId": 1,
     "CustomerName": "零售客户",
-    "OrderDate": "2026-03-18T15:23:49.607786+08:00",
+    "OrderDate": "2026-03-18T16:09:42.1582931+08:00",
     "OrderType": "入库",
-    "GrandTotal": 1000,
+    "GrandTotal": 6200,
     "Remarks": "",
     "Items": [
       {
@@ -17,29 +17,55 @@
         "Purity": 1.0,
         "UnitPrice": 10.0,
         "DiscountedPrice": 10.0,
-        "TotalPrice": 1000
+        "TotalPrice": 1000,
+        "StatisticTotalPrice": 1000
+      },
+      {
+        "Id": 2,
+        "ProductId": 1,
+        "ProductName": "黄金",
+        "GrossWeight": 200.0,
+        "NetWeight": 200.0,
+        "Purity": 0.8,
+        "UnitPrice": 10.0,
+        "DiscountedPrice": 8.0,
+        "TotalPrice": 1600,
+        "StatisticTotalPrice": 2000
+      },
+      {
+        "Id": 3,
+        "ProductId": 1,
+        "ProductName": "黄金",
+        "GrossWeight": 300.0,
+        "NetWeight": 300.0,
+        "Purity": 1.2,
+        "UnitPrice": 10.0,
+        "DiscountedPrice": 12.0,
+        "TotalPrice": 3600,
+        "StatisticTotalPrice": 3000
       }
     ]
   },
   {
     "Id": 2,
-    "CustomerId": 2,
-    "CustomerName": "合作门店",
-    "OrderDate": "2026-03-18T15:24:15.196509+08:00",
+    "CustomerId": 1,
+    "CustomerName": "零售客户",
+    "OrderDate": "2026-03-18T16:14:31.3726025+08:00",
     "OrderType": "入库",
-    "GrandTotal": 960,
+    "GrandTotal": 1000,
     "Remarks": "",
     "Items": [
       {
         "Id": 1,
-        "ProductId": 1,
-        "ProductName": "黄金",
-        "GrossWeight": 99.0,
-        "NetWeight": 98.0,
-        "Purity": 0.9,
-        "UnitPrice": 10.99,
-        "DiscountedPrice": 9.8,
-        "TotalPrice": 960
+        "ProductId": 2,
+        "ProductName": "18k",
+        "GrossWeight": 100.0,
+        "NetWeight": 100.0,
+        "Purity": 1.0,
+        "UnitPrice": 10.0,
+        "DiscountedPrice": 10.0,
+        "TotalPrice": 1000,
+        "StatisticTotalPrice": 1000
       }
     ]
   }

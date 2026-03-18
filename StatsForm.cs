@@ -103,8 +103,8 @@ namespace JewelryTool
                         {
                             重量阶梯 = tier.Name,
                             入库总重量 = tierItems.Sum(x => x.NetWeight),
-                            入库总金额 = tierItems.Sum(x => x.TotalPrice),
-                            每百克均价 = tierItems.Sum(x => x.TotalPrice) / (tierItems.Sum(x => x.NetWeight) + 0.0001m) * 100
+                            入库总金额 = tierItems.Sum(x => x.StatisticTotalPrice),
+                            每百克均价 = tierItems.Sum(x => x.StatisticTotalPrice) / (tierItems.Sum(x => x.NetWeight) + 0.0001m) * 100
                         };
 
             dgvPriceStats.DataSource = stats.ToList();

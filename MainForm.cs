@@ -281,7 +281,6 @@ namespace JewelryTool
             if (decimal.TryParse(zoomText, out decimal zoomRate))
             {
                 float scale = (float)(zoomRate / 100m);
-                // 只缩放中间的数据表格（dgvItems）
                 ScaleDataGridView(dgvItems, scale);
             }
         }
@@ -290,27 +289,22 @@ namespace JewelryTool
         {
             if (dgv == null) return;
 
-            // 保存原始字体大小（如果是第一次缩放）
             if (!dgv.Tag?.ToString().StartsWith("OriginalFontSize:") ?? true)
             {
                 float originalSize = dgv.Font?.Size ?? 9f;
                 dgv.Tag = $"OriginalFontSize:{originalSize}";
             }
 
-            // 解析原始字体大小
             string tagStr = dgv.Tag?.ToString() ?? "";
             if (tagStr.StartsWith("OriginalFontSize:"))
             {
                 if (float.TryParse(tagStr.Replace("OriginalFontSize:", ""), out float originalSize))
                 {
-                    // 计算新的字体大小
                     float newSize = originalSize * scale;
                     if (newSize >= 6 && newSize <= 36)
                     {
-                        // 缩放表格字体
                         dgv.Font = new Font(dgv.Font.FontFamily, newSize, dgv.Font.Style);
 
-                        // 缩放列标题字体
                         foreach (DataGridViewColumn column in dgv.Columns)
                         {
                             if (column.HeaderCell.Style.Font != null)
@@ -322,14 +316,12 @@ namespace JewelryTool
                             }
                         }
 
-                        // 缩放行高（根据字体大小调整）
                         int newRowHeight = (int)(dgv.RowTemplate.Height * scale);
                         if (newRowHeight >= 20 && newRowHeight <= 80)
                         {
                             dgv.RowTemplate.Height = newRowHeight;
                         }
 
-                        // 缩放列宽（根据字体大小调整）
                         foreach (DataGridViewColumn column in dgv.Columns)
                         {
                             int newWidth = (int)(column.Width * scale);
@@ -337,44 +329,6 @@ namespace JewelryTool
                             {
                                 column.Width = newWidth;
                             }
-                        }
-                    }
-                }
-            }
-        }
-
-        private void ScaleFonts(Control control, float scale)
-        {
-            // 缩放当前控件的字体
-            if (control.Font != null)
-            {
-                float newSize = control.Font.Size * scale;
-                if (newSize > 6 && newSize < 36) // 限制字体大小范围
-                {
-                    control.Font = new Font(control.Font.FontFamily, newSize, control.Font.Style);
-                }
-            }
-
-            // 递归缩放子控件
-            foreach (Control child in control.Controls)
-            {
-                ScaleFonts(child, scale);
-            }
-
-            // 特殊处理DataGridView的列标题字体
-            if (control is DataGridView dgv)
-            {
-                foreach (DataGridViewColumn column in dgv.Columns)
-                {
-                    if (column.HeaderCell.Style.Font != null)
-                    {
-                        float newSize = column.HeaderCell.Style.Font.Size * scale;
-                        if (newSize > 6 && newSize < 36)
-                        {
-                            column.HeaderCell.Style.Font = new Font(
-                                column.HeaderCell.Style.Font.FontFamily,
-                                newSize,
-                                column.HeaderCell.Style.Font.Style);
                         }
                     }
                 }
@@ -397,7 +351,7 @@ namespace JewelryTool
             if (e.RowIndex < 0) return;
             var currentRow = dgvItems.Rows[e.RowIndex];
 
-            // 成色折价
+            // 计算成色折价
             decimal purity = 0, unitPrice = 0;
             if (decimal.TryParse(currentRow.Cells[colPurity.Name].Value?.ToString(), out purity)
                 && decimal.TryParse(currentRow.Cells[colUnitPrice.Name].Value?.ToString(), out unitPrice))
@@ -406,7 +360,7 @@ namespace JewelryTool
                 currentRow.Cells[colDiscountedPrice.Name].Value = Math.Truncate(discountPrice * 10) / 10;
             }
 
-            // 单项总价 → 【核心修改】截断小数，只保留整数
+            // 计算单项总价
             decimal netWeight = 0, finalDiscountPrice = 0;
             if (decimal.TryParse(currentRow.Cells[colNetWeight.Name].Value?.ToString(), out netWeight)
                 && decimal.TryParse(currentRow.Cells[colDiscountedPrice.Name].Value?.ToString(), out finalDiscountPrice))
@@ -428,7 +382,6 @@ namespace JewelryTool
                     total += itemTotal;
                 }
             }
-            // 【核心修改】显示纯整数，无小数
             lblTotal.Text = $"单据总价：{total} 元";
         }
         #endregion
@@ -451,7 +404,6 @@ namespace JewelryTool
                     return;
                 }
 
-                // 【核心修改】总额取整数
                 int grandTotal = 0;
                 int.TryParse(lblTotal.Text.Replace("单据总价：", "").Replace("元", "").Trim(), out grandTotal);
 
@@ -471,18 +423,24 @@ namespace JewelryTool
                 foreach (DataGridViewRow row in dgvItems.Rows)
                 {
                     var product = products.FirstOrDefault(p => p.Id == Convert.ToInt32(row.Cells[colProduct.Name].Value ?? 0));
+
+                    // 直接计算统计总价（净重×单价），不操作界面
+                    decimal netWeight = Convert.ToDecimal(row.Cells[colNetWeight.Name].Value ?? 0);
+                    decimal unitPrice = Convert.ToDecimal(row.Cells[colUnitPrice.Name].Value ?? 0);
+                    int statTotal = (int)Math.Truncate(netWeight * unitPrice);
+
                     newOrder.Items.Add(new OrderItem
                     {
                         Id = newOrder.Items.Count + 1,
                         ProductId = product?.Id ?? 0,
                         ProductName = product?.Name ?? "",
                         GrossWeight = Convert.ToDecimal(row.Cells[colGrossWeight.Name].Value ?? 0),
-                        NetWeight = Convert.ToDecimal(row.Cells[colNetWeight.Name].Value ?? 0),
+                        NetWeight = netWeight,
                         Purity = Convert.ToDecimal(row.Cells[colPurity.Name].Value ?? 1),
-                        UnitPrice = Convert.ToDecimal(row.Cells[colUnitPrice.Name].Value ?? 0),
+                        UnitPrice = unitPrice,
                         DiscountedPrice = Convert.ToDecimal(row.Cells[colDiscountedPrice.Name].Value ?? 0),
-                        // 【核心修改】保存整数单项总价
-                        TotalPrice = Convert.ToInt32(row.Cells[colTotalPrice.Name].Value ?? 0)
+                        TotalPrice = Convert.ToInt32(row.Cells[colTotalPrice.Name].Value ?? 0),
+                        StatisticTotalPrice = statTotal
                     });
                 }
 
@@ -587,6 +545,7 @@ namespace JewelryTool
             {
                 using (PrintSettingForm settingForm = new PrintSettingForm(printPageSettings))
                 {
+                    // ✅ 修复：这里必须是 DialogResult.OK，不是 Dialog.OK
                     if (settingForm.ShowDialog() == DialogResult.OK)
                     {
                         printPageSettings = settingForm.ResultPageSettings;
@@ -657,11 +616,9 @@ namespace JewelryTool
 
                 int lineHeight = 20;
 
-                // 标题
                 g.DrawString("瑞华珠宝兑料单", titleFont, blackBrush, startX + usableWidth / 2 - 80, startY);
                 startY += 30;
 
-                // 基础信息
                 string custName = (cbCustomer.SelectedItem as Customer)?.Name ?? "未知客户";
                 string custText = $"客户：{custName}";
                 string dateText = $"日期：{dtpDate.Value:yyyy-MM-dd HH:mm}";
@@ -672,7 +629,6 @@ namespace JewelryTool
                 g.DrawString(typeText, headFont, blackBrush, startX + usableWidth * 2 / 3, startY);
                 startY += lineHeight * 2;
 
-                // 表头
                 string[] tableHeaders = { "序号", "品名", "毛重", "净重", "成色", "单价", "折价", "总价" };
                 int[] colWidths = new int[8];
                 colWidths[0] = (int)(usableWidth * 0.07);
@@ -693,7 +649,6 @@ namespace JewelryTool
                 startY += lineHeight;
                 g.DrawLine(blackPen, startX, startY - 5, startX + usableWidth, startY - 5);
 
-                // 明细
                 int rowCount = dgvItems.Rows.Count;
                 while (_printCurrentRowIndex < rowCount && (startY + lineHeight) < printArea.Bottom - 100)
                 {
@@ -727,7 +682,6 @@ namespace JewelryTool
                     _printCurrentRowIndex++;
                 }
 
-                // 合计与备注
                 if (_printCurrentRowIndex >= rowCount)
                 {
                     g.DrawLine(blackPen, startX, startY, startX + usableWidth, startY);
@@ -787,7 +741,6 @@ namespace JewelryTool
                 row.Cells[colPurity.Name].Value = item.Purity;
                 row.Cells[colUnitPrice.Name].Value = item.UnitPrice;
                 row.Cells[colDiscountedPrice.Name].Value = item.DiscountedPrice;
-                // 【核心修改】赋值整数，无小数
                 row.Cells[colTotalPrice.Name].Value = item.TotalPrice;
             }
 
@@ -816,7 +769,6 @@ namespace JewelryTool
         public string CustomerName { get; set; }
         public DateTime OrderDate { get; set; }
         public string OrderType { get; set; }
-        // 【核心修改】单据总价改为整型
         public int GrandTotal { get; set; }
         public string Remarks { get; set; }
         public List<OrderItem> Items { get; set; }
@@ -832,8 +784,9 @@ namespace JewelryTool
         public decimal Purity { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal DiscountedPrice { get; set; }
-        // 【核心修改】单项总价改为整型
         public int TotalPrice { get; set; }
+        // 统计专用总价：仅存储，不显示
+        public int StatisticTotalPrice { get; set; }
     }
     #endregion
 }
