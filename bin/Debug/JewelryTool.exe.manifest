@@ -54,14 +54,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="JewelryTool.exe" size="91064">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="JewelryTool.exe" size="99768">
       <assemblyIdentity name="JewelryTool" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>QEV3CyE/3hKv9apzHne5kG0Ou9LafiUCOCBEmtB+IHY=</dsig:DigestValue>
+        <dsig:DigestValue>8aw9hymAbs8JQyRtVihknZx7fqft1wy/v6wZ2PpEqy0=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

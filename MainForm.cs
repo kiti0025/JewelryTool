@@ -585,13 +585,11 @@ namespace JewelryTool
         {
             try
             {
-                using (PageSetupDialog pageSetupDialog = new PageSetupDialog())
+                using (PrintSettingForm settingForm = new PrintSettingForm(printPageSettings))
                 {
-                    pageSetupDialog.PageSettings = printPageSettings;
-                    pageSetupDialog.AllowPrinter = true;
-                    if (pageSetupDialog.ShowDialog() == DialogResult.OK)
+                    if (settingForm.ShowDialog() == DialogResult.OK)
                     {
-                        printPageSettings = pageSetupDialog.PageSettings;
+                        printPageSettings = settingForm.ResultPageSettings;
                         MessageBox.Show("打印设置已保存", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
