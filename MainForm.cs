@@ -427,7 +427,8 @@ namespace JewelryTool
                     // 直接计算统计总价（净重×单价），不操作界面
                     decimal netWeight = Convert.ToDecimal(row.Cells[colNetWeight.Name].Value ?? 0);
                     decimal unitPrice = Convert.ToDecimal(row.Cells[colUnitPrice.Name].Value ?? 0);
-                    int statTotal = (int)Math.Truncate(netWeight * unitPrice);
+                    // ✅ 修改：统计总价改为小数（保留2位小数，珠宝行业标准精度）
+                    decimal statTotal = Math.Round(netWeight * unitPrice, 2);
 
                     newOrder.Items.Add(new OrderItem
                     {
@@ -439,8 +440,8 @@ namespace JewelryTool
                         Purity = Convert.ToDecimal(row.Cells[colPurity.Name].Value ?? 1),
                         UnitPrice = unitPrice,
                         DiscountedPrice = Convert.ToDecimal(row.Cells[colDiscountedPrice.Name].Value ?? 0),
-                        TotalPrice = Convert.ToInt32(row.Cells[colTotalPrice.Name].Value ?? 0),
-                        StatisticTotalPrice = statTotal
+                        TotalPrice = Convert.ToInt32(row.Cells[colTotalPrice.Name].Value ?? 0), // 保持int不变
+                        StatisticTotalPrice = statTotal // ✅ 小数类型赋值
                     });
                 }
 
@@ -612,7 +613,8 @@ namespace JewelryTool
                 Font totalFont = new Font("微软雅黑", 10, FontStyle.Bold);
                 Font remarkFont = new Font("微软雅黑", 7);
                 Brush blackBrush = Brushes.Black;
-                Pen blackPen = Pens.Black;
+                // ✅ 核心修复：统一创建1像素粗细的实线笔，所有线条完全一致
+                Pen linePen = new Pen(Color.Black, 1);
 
                 int lineHeight = 20;
 
@@ -647,7 +649,8 @@ namespace JewelryTool
                     currentX += colWidths[i];
                 }
                 startY += lineHeight;
-                g.DrawLine(blackPen, startX, startY - 5, startX + usableWidth, startY - 5);
+                // 表头下方线条（统一粗细）
+                g.DrawLine(linePen, startX, startY - 5, startX + usableWidth, startY - 5);
 
                 int rowCount = dgvItems.Rows.Count;
                 while (_printCurrentRowIndex < rowCount && (startY + lineHeight) < printArea.Bottom - 100)
@@ -679,12 +682,15 @@ namespace JewelryTool
                     }
 
                     startY += lineHeight;
+                    // ✅ 修复：统一坐标+统一粗细，无重叠
+                    g.DrawLine(linePen, startX, startY - 1, startX + usableWidth, startY - 1);
+
                     _printCurrentRowIndex++;
                 }
 
                 if (_printCurrentRowIndex >= rowCount)
                 {
-                    g.DrawLine(blackPen, startX, startY, startX + usableWidth, startY);
+                    // ✅ 核心修复：删除重复的画线，解决最后一行两条线的问题
                     startY += lineHeight;
                     g.DrawString(lblTotal.Text, totalFont, Brushes.DarkRed, startX, startY);
                     startY += lineHeight * 2;
@@ -699,11 +705,13 @@ namespace JewelryTool
 
                 e.HasMorePages = _printCurrentRowIndex < rowCount;
 
+                // 释放资源
                 titleFont.Dispose();
                 headFont.Dispose();
                 tableFont.Dispose();
                 totalFont.Dispose();
                 remarkFont.Dispose();
+                linePen.Dispose();
             }
             catch (Exception ex)
             {
@@ -784,9 +792,9 @@ namespace JewelryTool
         public decimal Purity { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal DiscountedPrice { get; set; }
-        public int TotalPrice { get; set; }
-        // 统计专用总价：仅存储，不显示
-        public int StatisticTotalPrice { get; set; }
+        public int TotalPrice { get; set; } // 保持int类型不变
+        // ✅ 修改：统计专用总价 改为小数类型（decimal）
+        public decimal StatisticTotalPrice { get; set; }
     }
     #endregion
 }

@@ -70,7 +70,7 @@ namespace JewelryTool
                                         - g.Where(x => x != null && orders.First(o => o.Items.Contains(x)).OrderType == "出库").Sum(x => x?.NetWeight ?? 0),
                             入库总金额 = g.Where(x => x != null && orders.First(o => o.Items.Contains(x)).OrderType == "入库").Sum(x => x?.TotalPrice ?? 0),
                             出库总金额 = g.Where(x => x != null && orders.First(o => o.Items.Contains(x)).OrderType == "出库").Sum(x => x?.TotalPrice ?? 0),
-                            总库存每克均价 = g.Where(x => x != null && orders.First(o => o.Items.Contains(x)).OrderType == "入库").Sum(x => x?.TotalPrice ?? 0)
+                            总库存每克均价 = g.Where(x => x != null && orders.First(o => o.Items.Contains(x)).OrderType == "入库").Sum(x => x?.StatisticTotalPrice ?? 0)
                                         / (g.Where(x => x != null && orders.First(o => o.Items.Contains(x)).OrderType == "入库").Sum(x => x?.NetWeight ?? 0) + 0.0001m)
                         };
 

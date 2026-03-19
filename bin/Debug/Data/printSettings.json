@@ -1,0 +1,14 @@
+{
+  "PaperPresets": [
+    {
+      "Name": "二分复写纸",
+      "Width": 241.0,
+      "Height": 140.0
+    },
+    {
+      "Name": "A4纸",
+      "Width": 210.0,
+      "Height": 297.0
+    }
+  ]
+}
