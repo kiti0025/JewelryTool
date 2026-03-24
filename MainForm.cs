@@ -605,7 +605,6 @@ namespace JewelryTool
                 Rectangle printArea = e.MarginBounds;
                 int startX = printArea.Left;
                 int startY = printArea.Top;
-                int usableWidth = printArea.Width;
 
                 Font titleFont = new Font("微软雅黑", 12, FontStyle.Bold);
                 Font headFont = new Font("微软雅黑", 9);
@@ -613,84 +612,100 @@ namespace JewelryTool
                 Font totalFont = new Font("微软雅黑", 10, FontStyle.Bold);
                 Font remarkFont = new Font("微软雅黑", 7);
                 Brush blackBrush = Brushes.Black;
-                // ✅ 核心修复：统一创建1像素粗细的实线笔，所有线条完全一致
                 Pen linePen = new Pen(Color.Black, 1);
 
                 int lineHeight = 20;
 
-                g.DrawString("瑞华珠宝兑料单", titleFont, blackBrush, startX + usableWidth / 2 - 80, startY);
+                // 标题
+                g.DrawString("瑞华珠宝兑料单", titleFont, blackBrush, startX + 100, startY);
                 startY += 30;
 
+                // 客户、日期、类型
                 string custName = (cbCustomer.SelectedItem as Customer)?.Name ?? "未知客户";
                 string custText = $"客户：{custName}";
                 string dateText = $"日期：{dtpDate.Value:yyyy-MM-dd HH:mm}";
                 string typeText = $"单据类型：{cbType.SelectedItem?.ToString() ?? "入库"}";
 
                 g.DrawString(custText, headFont, blackBrush, startX, startY);
-                g.DrawString(dateText, headFont, blackBrush, startX + usableWidth / 3, startY);
-                g.DrawString(typeText, headFont, blackBrush, startX + usableWidth * 2 / 3, startY);
+                g.DrawString(dateText, headFont, blackBrush, startX + 200, startY);
+                g.DrawString(typeText, headFont, blackBrush, startX + 400, startY);
                 startY += lineHeight * 2;
 
+                // 表头与列宽（总价是最后一列）
                 string[] tableHeaders = { "序号", "品名", "毛重", "净重", "成色", "单价", "折价", "总价" };
-                int[] colWidths = new int[8];
-                colWidths[0] = (int)(usableWidth * 0.07);
-                colWidths[1] = (int)(usableWidth * 0.15);
-                colWidths[2] = (int)(usableWidth * 0.10);
-                colWidths[3] = (int)(usableWidth * 0.10);
-                colWidths[4] = (int)(usableWidth * 0.08);
-                colWidths[5] = (int)(usableWidth * 0.10);
-                colWidths[6] = (int)(usableWidth * 0.12);
-                colWidths[7] = (int)(usableWidth * 0.18);
+                int[] colWidths = { 45, 90, 65, 65, 50, 70, 80, 90 };
 
+                // 计算每根竖线X坐标（网格只到最后一列“总价”为止）
+                List<int> xList = new List<int> { startX };
                 int currentX = startX;
+                foreach (int w in colWidths)
+                {
+                    currentX += w;
+                    xList.Add(currentX);
+                }
+                int tableRightX = xList.Last(); // 表格右边界（总价列结束位置）
+
+                // 画表头
+                currentX = startX;
                 for (int i = 0; i < tableHeaders.Length; i++)
                 {
-                    g.DrawString(tableHeaders[i], headFont, blackBrush, currentX, startY);
+                    g.DrawString(tableHeaders[i], headFont, blackBrush, currentX + 2, startY + 2);
                     currentX += colWidths[i];
                 }
-                startY += lineHeight;
-                // 表头下方线条（统一粗细）
-                g.DrawLine(linePen, startX, startY - 5, startX + usableWidth, startY - 5);
+                int headerBottom = startY + lineHeight;
+                startY = headerBottom;
 
+                // 表头上下横线（只到表格右边界）
+                g.DrawLine(linePen, startX, headerBottom - lineHeight, tableRightX, headerBottom - lineHeight);
+                g.DrawLine(linePen, startX, headerBottom, tableRightX, headerBottom);
+
+                int tableBottom = headerBottom;
                 int rowCount = dgvItems.Rows.Count;
+
+                // 画数据行
                 while (_printCurrentRowIndex < rowCount && (startY + lineHeight) < printArea.Bottom - 100)
                 {
                     DataGridViewRow row = dgvItems.Rows[_printCurrentRowIndex];
                     currentX = startX;
 
-                    for (int i = 0; i < dgvItems.Columns.Count; i++)
+                    for (int i = 0; i < colWidths.Length; i++)
                     {
-                        string cellText = "";
-
-                        if (i == 1)
+                        string txt = "";
+                        if (i == 1) // 品名
                         {
-                            object cellValue = row.Cells[i].Value;
-                            if (cellValue != null && int.TryParse(cellValue.ToString(), out int productId))
+                            if (int.TryParse(row.Cells[i]?.Value?.ToString(), out int pid))
                             {
-                                var product = products.FirstOrDefault(p => p.Id == productId);
-                                cellText = product?.Name ?? "";
+                                // ✅ 核心修复：Lambda参数名改为prod，避免与外层变量p冲突
+                                var p = products.FirstOrDefault(prod => prod.Id == pid);
+                                txt = p?.Name ?? "";
                             }
                         }
                         else
                         {
-                            object cellValue = row.Cells[i].Value;
-                            cellText = cellValue?.ToString() ?? "";
+                            txt = row.Cells[i]?.Value?.ToString() ?? "";
                         }
 
-                        g.DrawString(cellText, tableFont, blackBrush, currentX, startY);
+                        g.DrawString(txt, tableFont, blackBrush, currentX + 2, startY + 2);
                         currentX += colWidths[i];
                     }
 
                     startY += lineHeight;
-                    // ✅ 修复：统一坐标+统一粗细，无重叠
-                    g.DrawLine(linePen, startX, startY - 1, startX + usableWidth, startY - 1);
+                    tableBottom = startY;
+                    // 行横线（只到表格右边界）
+                    g.DrawLine(linePen, startX, startY, tableRightX, startY);
 
                     _printCurrentRowIndex++;
                 }
 
+                // 画竖线（完整网格，只到总价列）
+                foreach (int x in xList)
+                {
+                    g.DrawLine(linePen, x, headerBottom - lineHeight, x, tableBottom);
+                }
+
+                // 总价、备注
                 if (_printCurrentRowIndex >= rowCount)
                 {
-                    // ✅ 核心修复：删除重复的画线，解决最后一行两条线的问题
                     startY += lineHeight;
                     g.DrawString(lblTotal.Text, totalFont, Brushes.DarkRed, startX, startY);
                     startY += lineHeight * 2;
@@ -705,7 +720,6 @@ namespace JewelryTool
 
                 e.HasMorePages = _printCurrentRowIndex < rowCount;
 
-                // 释放资源
                 titleFont.Dispose();
                 headFont.Dispose();
                 tableFont.Dispose();
@@ -715,7 +729,7 @@ namespace JewelryTool
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"打印内容生成失败：{ex.Message}", "打印错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"打印出错：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         #endregion
