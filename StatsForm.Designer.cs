@@ -20,6 +20,8 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.dgvProductStats = new System.Windows.Forms.DataGridView();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            // 新增：日期选择器
+            this.dtpDate = new System.Windows.Forms.DateTimePicker();
             this.panelPriceStats = new System.Windows.Forms.Panel();
             this.lblSelectedStats = new System.Windows.Forms.Label();
             this.dgvPriceStats = new System.Windows.Forms.DataGridView();
@@ -75,8 +77,9 @@
             this.dgvProductStats.Size = new System.Drawing.Size(1046, 485);
             this.dgvProductStats.TabIndex = 0;
 
-            // tabPage2
+            // tabPage2 【每百克阶梯均价】
             this.tabPage2.Controls.Add(this.panelPriceStats);
+            this.tabPage2.Controls.Add(this.dtpDate);
             this.tabPage2.Location = new System.Drawing.Point(4, 25);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
@@ -85,20 +88,31 @@
             this.tabPage2.Text = "每百克阶梯均价";
             this.tabPage2.UseVisualStyleBackColor = true;
 
+            // dtpDate 【新增：日期选择器】
+            this.dtpDate.Dock = System.Windows.Forms.DockStyle.Top;
+            this.dtpDate.Font = new System.Drawing.Font("微软雅黑", 9F);
+            this.dtpDate.Location = new System.Drawing.Point(3, 3);
+            this.dtpDate.Name = "dtpDate";
+            this.dtpDate.Size = new System.Drawing.Size(1046, 27);
+            this.dtpDate.TabIndex = 1;
+            this.dtpDate.Value = new System.DateTime(2025, 11, 1, 0, 0, 0, 0);
+            // 绑定日期切换事件
+            this.dtpDate.ValueChanged += new System.EventHandler(this.dtpDate_ValueChanged);
+
             // panelPriceStats
             this.panelPriceStats.Controls.Add(this.lblSelectedStats);
             this.panelPriceStats.Controls.Add(this.dgvPriceStats);
             this.panelPriceStats.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelPriceStats.Location = new System.Drawing.Point(3, 3);
+            this.panelPriceStats.Location = new System.Drawing.Point(3, 30);
             this.panelPriceStats.Name = "panelPriceStats";
-            this.panelPriceStats.Size = new System.Drawing.Size(1046, 485);
+            this.panelPriceStats.Size = new System.Drawing.Size(1046, 458);
             this.panelPriceStats.TabIndex = 0;
 
             // lblSelectedStats
             this.lblSelectedStats.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.lblSelectedStats.Font = new System.Drawing.Font("微软雅黑", 10F, System.Drawing.FontStyle.Bold);
             this.lblSelectedStats.ForeColor = System.Drawing.Color.DarkBlue;
-            this.lblSelectedStats.Location = new System.Drawing.Point(0, 450);
+            this.lblSelectedStats.Location = new System.Drawing.Point(0, 423);
             this.lblSelectedStats.Name = "lblSelectedStats";
             this.lblSelectedStats.Size = new System.Drawing.Size(1046, 35);
             this.lblSelectedStats.TabIndex = 1;
@@ -115,7 +129,7 @@
             this.dgvPriceStats.Name = "dgvPriceStats";
             this.dgvPriceStats.ReadOnly = true;
             this.dgvPriceStats.RowHeadersVisible = false;
-            this.dgvPriceStats.Size = new System.Drawing.Size(1046, 485);
+            this.dgvPriceStats.Size = new System.Drawing.Size(1046, 423);
             this.dgvPriceStats.TabIndex = 0;
             this.dgvPriceStats.SelectionChanged += new System.EventHandler(this.DgvPriceStats_SelectionChanged);
 
@@ -212,5 +226,7 @@
         private System.Windows.Forms.Button btnClose;
         private System.Windows.Forms.Panel panelPriceStats;
         private System.Windows.Forms.Label lblSelectedStats;
+        // 新增：日期选择器控件声明
+        private System.Windows.Forms.DateTimePicker dtpDate;
     }
 }

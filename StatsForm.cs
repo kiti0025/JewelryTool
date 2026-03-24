@@ -26,6 +26,8 @@ namespace JewelryTool
 
         private void StatsForm_Load(object sender, EventArgs e)
         {
+            // 默认选中当日日期
+            dtpDate.Value = DateTime.Now;
             LoadAllData();
             CalculateAllStats();
         }
@@ -85,6 +87,7 @@ namespace JewelryTool
             }
         }
 
+        // 仅统计【当日】黄金每百克阶梯均价
         private void CalculatePriceStats()
         {
             var tiers = new List<dynamic>();
@@ -94,10 +97,14 @@ namespace JewelryTool
             }
             tiers.Add(new { Min = 5000m, Max = decimal.MaxValue, Name = "5000克以上" });
 
+            // 获取选中的统计日期
+            DateTime targetDate = dtpDate.Value.Date;
+
             var stats = from tier in tiers
-                        let inItems = orders.Where(o => o.OrderType == "入库")
-                   .SelectMany(o => o.Items)
-                   .Where(x => x.ProductName == "黄金")  // 只统计黄金
+                            // 核心：筛选 当日+入库+黄金
+                        let inItems = orders.Where(o => o.OrderType == "入库" && o.OrderDate.Date == targetDate)
+                                           .SelectMany(o => o.Items)
+                                           .Where(x => x.ProductName == "黄金")
                         let tierItems = inItems.Where(x => x.NetWeight >= tier.Min && x.NetWeight < tier.Max)
                         select new
                         {
@@ -156,7 +163,7 @@ namespace JewelryTool
         {
             LoadAllData();
             CalculateAllStats();
-            MessageBox.Show("数据刷新完成", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show($"数据刷新完成 | 统计日期：{dtpDate.Value:yyyy-MM-dd}", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void BtnExportStats_Click(object sender, EventArgs e)
@@ -174,7 +181,7 @@ namespace JewelryTool
                         var sheet1 = package.Workbook.Worksheets.Add("总库存均价统计");
                         ExportGridViewToSheet(dgvProductStats, sheet1);
 
-                        var sheet2 = package.Workbook.Worksheets.Add("每百克阶梯均价");
+                        var sheet2 = package.Workbook.Worksheets.Add($"当日每百克均价({dtpDate.Value:yyyyMMdd})");
                         ExportGridViewToSheet(dgvPriceStats, sheet2);
 
                         var sheet3 = package.Workbook.Worksheets.Add("每日出入库统计");
@@ -211,6 +218,12 @@ namespace JewelryTool
             decimal avgPer100g = totalAmount / (totalWeight + 0.0001m) * 100;
 
             lblSelectedStats.Text = $"已选 {dgvPriceStats.SelectedRows.Count} 项 | 总重量：{totalWeight:F2}g | 总金额：{totalAmount:F2}元 | 合并每百克均价：{avgPer100g:F2}元";
+        }
+
+        // 日期切换 → 立即刷新统计
+        private void dtpDate_ValueChanged(object sender, EventArgs e)
+        {
+            CalculatePriceStats();
         }
 
         private void ExportGridViewToSheet(DataGridView dgv, ExcelWorksheet sheet)
