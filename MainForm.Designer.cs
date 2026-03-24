@@ -1,4 +1,6 @@
-﻿namespace JewelryTool
+﻿using System.Drawing;
+
+namespace JewelryTool
 {
     partial class MainForm
     {
@@ -20,7 +22,9 @@
             this.cbZoom = new System.Windows.Forms.ComboBox();
             this.label5 = new System.Windows.Forms.Label();
             this.btnHistory = new System.Windows.Forms.Button();
+            this.btnDeleteProduct = new System.Windows.Forms.Button();
             this.btnAddProduct = new System.Windows.Forms.Button();
+            this.btnDeleteCustomer = new System.Windows.Forms.Button();
             this.cbType = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
             this.dtpDate = new System.Windows.Forms.DateTimePicker();
@@ -57,7 +61,9 @@
             this.topPanel.Controls.Add(this.cbZoom);
             this.topPanel.Controls.Add(this.label5);
             this.topPanel.Controls.Add(this.btnHistory);
+            this.topPanel.Controls.Add(this.btnDeleteProduct);
             this.topPanel.Controls.Add(this.btnAddProduct);
+            this.topPanel.Controls.Add(this.btnDeleteCustomer);
             this.topPanel.Controls.Add(this.cbType);
             this.topPanel.Controls.Add(this.label3);
             this.topPanel.Controls.Add(this.dtpDate);
@@ -66,13 +72,113 @@
             this.topPanel.Controls.Add(this.cbCustomer);
             this.topPanel.Controls.Add(this.label1);
             this.topPanel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.topPanel.Location = new System.Drawing.Point(0, 0);
+            this.topPanel.Location = new Point(0, 0);
             this.topPanel.Name = "topPanel";
             this.topPanel.Padding = new System.Windows.Forms.Padding(10);
-            this.topPanel.Size = new System.Drawing.Size(1280, 60);
+            this.topPanel.Size = new Size(1280, 60);
             this.topPanel.TabIndex = 0;
 
-            // cbZoom
+            // label1 - 客户
+            this.label1.AutoSize = true;
+            this.label1.Location = new Point(15, 15);
+            this.label1.Name = "label1";
+            this.label1.Size = new Size(44, 17);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "客户：";
+
+            // cbCustomer - 客户下拉
+            this.cbCustomer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbCustomer.FormattingEnabled = true;
+            this.cbCustomer.Location = new Point(65, 12);
+            this.cbCustomer.Name = "cbCustomer";
+            this.cbCustomer.Size = new Size(160, 25);
+            this.cbCustomer.TabIndex = 1;
+
+            // btnDeleteCustomer - 删除客户
+            this.btnDeleteCustomer.Location = new Point(235, 10);
+            this.btnDeleteCustomer.Name = "btnDeleteCustomer";
+            this.btnDeleteCustomer.Size = new Size(80, 28);
+            this.btnDeleteCustomer.TabIndex = 2;
+            this.btnDeleteCustomer.Text = "删除客户";
+            this.btnDeleteCustomer.UseVisualStyleBackColor = true;
+            this.btnDeleteCustomer.ForeColor = System.Drawing.Color.Red;
+
+            // btnAddCustomer - 新增客户
+            this.btnAddCustomer.Location = new Point(320, 10);
+            this.btnAddCustomer.Name = "btnAddCustomer";
+            this.btnAddCustomer.Size = new Size(80, 28);
+            this.btnAddCustomer.TabIndex = 3;
+            this.btnAddCustomer.Text = "新增客户";
+            this.btnAddCustomer.UseVisualStyleBackColor = true;
+
+            // label2 - 日期
+            this.label2.AutoSize = true;
+            this.label2.Location = new Point(410, 15);
+            this.label2.Name = "label2";
+            this.label2.Size = new Size(44, 17);
+            this.label2.TabIndex = 4;
+            this.label2.Text = "日期：";
+
+            // dtpDate - 日期选择器
+            this.dtpDate.Location = new Point(460, 12);
+            this.dtpDate.Name = "dtpDate";
+            this.dtpDate.Size = new Size(180, 25);
+            this.dtpDate.TabIndex = 5;
+
+            // label3 - 单据类型
+            this.label3.AutoSize = true;
+            this.label3.Location = new Point(650, 15);
+            this.label3.Name = "label3";
+            this.label3.Size = new Size(68, 17);
+            this.label3.TabIndex = 6;
+            this.label3.Text = "单据类型：";
+
+            // cbType - 单据类型
+            this.cbType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbType.FormattingEnabled = true;
+            this.cbType.Items.AddRange(new object[] {
+            "入库",
+            "出库"});
+            this.cbType.Location = new Point(725, 12);
+            this.cbType.Name = "cbType";
+            this.cbType.Size = new Size(100, 25);
+            this.cbType.TabIndex = 7;
+
+            // btnDeleteProduct - 删除品类
+            this.btnDeleteProduct.Location = new Point(835, 10);
+            this.btnDeleteProduct.Name = "btnDeleteProduct";
+            this.btnDeleteProduct.Size = new Size(80, 28);
+            this.btnDeleteProduct.TabIndex = 8;
+            this.btnDeleteProduct.Text = "删除品类";
+            this.btnDeleteProduct.UseVisualStyleBackColor = true;
+            this.btnDeleteProduct.ForeColor = System.Drawing.Color.Red;
+
+            // btnAddProduct - 新增品类
+            this.btnAddProduct.Location = new Point(920, 10);
+            this.btnAddProduct.Name = "btnAddProduct";
+            this.btnAddProduct.Size = new Size(80, 28);
+            this.btnAddProduct.TabIndex = 9;
+            this.btnAddProduct.Text = "新增品类";
+            this.btnAddProduct.UseVisualStyleBackColor = true;
+
+            // btnHistory - 历史单据
+            this.btnHistory.BackColor = System.Drawing.Color.LightCyan;
+            this.btnHistory.Location = new Point(1005, 10);
+            this.btnHistory.Name = "btnHistory";
+            this.btnHistory.Size = new Size(100, 28);
+            this.btnHistory.TabIndex = 10;
+            this.btnHistory.Text = "历史单据";
+            this.btnHistory.UseVisualStyleBackColor = false;
+
+            // label5 - 缩放
+            this.label5.AutoSize = true;
+            this.label5.Location = new Point(1115, 15);
+            this.label5.Name = "label5";
+            this.label5.Size = new Size(56, 17);
+            this.label5.TabIndex = 11;
+            this.label5.Text = "缩放：";
+
+            // cbZoom - 缩放下拉
             this.cbZoom.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbZoom.FormattingEnabled = true;
             this.cbZoom.Items.AddRange(new object[] {
@@ -83,93 +189,11 @@
             "150%",
             "175%",
             "200%"});
-            this.cbZoom.Location = new System.Drawing.Point(1120, 12);
+            this.cbZoom.Location = new Point(1175, 12);
             this.cbZoom.Name = "cbZoom";
-            this.cbZoom.Size = new System.Drawing.Size(80, 25);
-            this.cbZoom.TabIndex = 10;
+            this.cbZoom.Size = new Size(80, 25);
+            this.cbZoom.TabIndex = 12;
             this.cbZoom.Text = "100%";
-
-            // label5
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(1060, 15);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(56, 17);
-            this.label5.TabIndex = 9;
-            this.label5.Text = "缩放：";
-
-            // btnHistory
-            this.btnHistory.BackColor = System.Drawing.Color.LightCyan;
-            this.btnHistory.Location = new System.Drawing.Point(850, 10);
-            this.btnHistory.Name = "btnHistory";
-            this.btnHistory.Size = new System.Drawing.Size(100, 28);
-            this.btnHistory.TabIndex = 8;
-            this.btnHistory.Text = "历史单据";
-            this.btnHistory.UseVisualStyleBackColor = false;
-
-            // btnAddProduct
-            this.btnAddProduct.Location = new System.Drawing.Point(760, 10);
-            this.btnAddProduct.Name = "btnAddProduct";
-            this.btnAddProduct.Size = new System.Drawing.Size(80, 28);
-            this.btnAddProduct.TabIndex = 7;
-            this.btnAddProduct.Text = "新增品类";
-            this.btnAddProduct.UseVisualStyleBackColor = true;
-
-            // cbType
-            this.cbType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbType.FormattingEnabled = true;
-            this.cbType.Items.AddRange(new object[] {
-            "入库",
-            "出库"});
-            this.cbType.Location = new System.Drawing.Point(640, 12);
-            this.cbType.Name = "cbType";
-            this.cbType.Size = new System.Drawing.Size(100, 25);
-            this.cbType.TabIndex = 6;
-
-            // label3
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(560, 15);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(68, 17);
-            this.label3.TabIndex = 5;
-            this.label3.Text = "单据类型：";
-
-            // dtpDate
-            this.dtpDate.Location = new System.Drawing.Point(380, 12);
-            this.dtpDate.Name = "dtpDate";
-            this.dtpDate.Size = new System.Drawing.Size(180, 25);
-            this.dtpDate.TabIndex = 4;
-
-            // label2
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(330, 15);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(44, 17);
-            this.label2.TabIndex = 3;
-            this.label2.Text = "日期：";
-
-            // btnAddCustomer
-            this.btnAddCustomer.Location = new System.Drawing.Point(230, 10);
-            this.btnAddCustomer.Name = "btnAddCustomer";
-            this.btnAddCustomer.Size = new System.Drawing.Size(80, 28);
-            this.btnAddCustomer.TabIndex = 2;
-            this.btnAddCustomer.Text = "新增客户";
-            this.btnAddCustomer.UseVisualStyleBackColor = true;
-
-            // cbCustomer
-            this.cbCustomer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbCustomer.FormattingEnabled = true;
-            this.cbCustomer.Location = new System.Drawing.Point(60, 12);
-            this.cbCustomer.Name = "cbCustomer";
-            this.cbCustomer.Size = new System.Drawing.Size(160, 25);
-            this.cbCustomer.TabIndex = 1;
-
-            // label1
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(10, 15);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(44, 17);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "客户：";
 
             // dgvItems
             this.dgvItems.AllowUserToAddRows = false;
@@ -184,11 +208,11 @@
             this.colDiscountedPrice,
             this.colTotalPrice});
             this.dgvItems.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvItems.Location = new System.Drawing.Point(0, 60);
+            this.dgvItems.Location = new Point(0, 60);
             this.dgvItems.Name = "dgvItems";
             this.dgvItems.RowHeadersVisible = false;
             this.dgvItems.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvItems.Size = new System.Drawing.Size(1280, 511);
+            this.dgvItems.Size = new Size(1280, 511);
             this.dgvItems.TabIndex = 1;
 
             // colIndex
@@ -246,30 +270,30 @@
             this.bottomPanel.Controls.Add(this.btnDeleteRow);
             this.bottomPanel.Controls.Add(this.btnAddRow);
             this.bottomPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.bottomPanel.Location = new System.Drawing.Point(0, 571);
+            this.bottomPanel.Location = new Point(0, 571);
             this.bottomPanel.Name = "bottomPanel";
-            this.bottomPanel.Size = new System.Drawing.Size(1280, 120);
+            this.bottomPanel.Size = new Size(1280, 120);
             this.bottomPanel.TabIndex = 2;
 
             // btnPrintSetting
-            this.btnPrintSetting.Location = new System.Drawing.Point(590, 10);
+            this.btnPrintSetting.Location = new Point(590, 10);
             this.btnPrintSetting.Name = "btnPrintSetting";
-            this.btnPrintSetting.Size = new System.Drawing.Size(100, 35);
+            this.btnPrintSetting.Size = new Size(100, 35);
             this.btnPrintSetting.TabIndex = 9;
             this.btnPrintSetting.Text = "打印设置";
             this.btnPrintSetting.UseVisualStyleBackColor = true;
 
             // txtRemarks
-            this.txtRemarks.Location = new System.Drawing.Point(70, 87);
+            this.txtRemarks.Location = new Point(70, 87);
             this.txtRemarks.Name = "txtRemarks";
-            this.txtRemarks.Size = new System.Drawing.Size(800, 25);
+            this.txtRemarks.Size = new Size(800, 25);
             this.txtRemarks.TabIndex = 8;
 
             // label4
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(15, 90);
+            this.label4.Location = new Point(15, 90);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(44, 17);
+            this.label4.Size = new Size(44, 17);
             this.label4.TabIndex = 7;
             this.label4.Text = "备注：";
 
@@ -277,58 +301,59 @@
             this.lblTotal.AutoSize = true;
             this.lblTotal.Font = new System.Drawing.Font("微软雅黑", 14F, System.Drawing.FontStyle.Bold);
             this.lblTotal.ForeColor = System.Drawing.Color.DarkRed;
-            this.lblTotal.Location = new System.Drawing.Point(15, 55);
+            this.lblTotal.Location = new Point(15, 55);
             this.lblTotal.Name = "lblTotal";
-            this.lblTotal.Size = new System.Drawing.Size(147, 24);
+            this.lblTotal.Size = new Size(147, 24);
             this.lblTotal.TabIndex = 6;
             this.lblTotal.Text = "单据总价：0.00 元";
 
             // btnStats
             this.btnStats.BackColor = System.Drawing.Color.LightBlue;
-            this.btnStats.Location = new System.Drawing.Point(950, 10);
+            this.btnStats.Location = new Point(950, 10);
             this.btnStats.Name = "btnStats";
-            this.btnStats.Size = new System.Drawing.Size(100, 35);
+            this.btnStats.Size = new Size(100, 35);
             this.btnStats.TabIndex = 5;
             this.btnStats.Text = "统计中心";
             this.btnStats.UseVisualStyleBackColor = false;
 
             // btnPrint
-            this.btnPrint.Location = new System.Drawing.Point(700, 10);
+            this.btnPrint.Location = new Point(700, 10);
+            this.btnPrint.Location = new Point(700, 10);
             this.btnPrint.Name = "btnPrint";
-            this.btnPrint.Size = new System.Drawing.Size(110, 35);
+            this.btnPrint.Size = new Size(110, 35);
             this.btnPrint.TabIndex = 4;
             this.btnPrint.Text = "打印兑料单";
             this.btnPrint.UseVisualStyleBackColor = true;
 
             // btnExportExcel
-            this.btnExportExcel.Location = new System.Drawing.Point(355, 10);
+            this.btnExportExcel.Location = new Point(355, 10);
             this.btnExportExcel.Name = "btnExportExcel";
-            this.btnExportExcel.Size = new System.Drawing.Size(100, 35);
+            this.btnExportExcel.Size = new Size(100, 35);
             this.btnExportExcel.TabIndex = 3;
             this.btnExportExcel.Text = "导出Excel";
             this.btnExportExcel.UseVisualStyleBackColor = true;
 
             // btnSave
             this.btnSave.BackColor = System.Drawing.Color.LightGreen;
-            this.btnSave.Location = new System.Drawing.Point(240, 10);
+            this.btnSave.Location = new Point(240, 10);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(100, 35);
+            this.btnSave.Size = new Size(100, 35);
             this.btnSave.TabIndex = 2;
             this.btnSave.Text = "保存单据";
             this.btnSave.UseVisualStyleBackColor = false;
 
             // btnDeleteRow
-            this.btnDeleteRow.Location = new System.Drawing.Point(115, 10);
+            this.btnDeleteRow.Location = new Point(115, 10);
             this.btnDeleteRow.Name = "btnDeleteRow";
-            this.btnDeleteRow.Size = new System.Drawing.Size(110, 35);
+            this.btnDeleteRow.Size = new Size(110, 35);
             this.btnDeleteRow.TabIndex = 1;
             this.btnDeleteRow.Text = "删除选中行";
             this.btnDeleteRow.UseVisualStyleBackColor = true;
 
             // btnAddRow
-            this.btnAddRow.Location = new System.Drawing.Point(15, 10);
+            this.btnAddRow.Location = new Point(15, 10);
             this.btnAddRow.Name = "btnAddRow";
-            this.btnAddRow.Size = new System.Drawing.Size(90, 35);
+            this.btnAddRow.Size = new Size(90, 35);
             this.btnAddRow.TabIndex = 0;
             this.btnAddRow.Text = "新增行";
             this.btnAddRow.UseVisualStyleBackColor = true;
@@ -336,7 +361,7 @@
             // MainForm
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1280, 691);
+            this.ClientSize = new Size(1280, 691);
             this.Controls.Add(this.dgvItems);
             this.Controls.Add(this.bottomPanel);
             this.Controls.Add(this.topPanel);
@@ -356,6 +381,8 @@
 
         private System.Windows.Forms.Panel topPanel;
         private System.Windows.Forms.Button btnAddProduct;
+        private System.Windows.Forms.Button btnDeleteProduct;
+        private System.Windows.Forms.Button btnDeleteCustomer;
         private System.Windows.Forms.ComboBox cbType;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.DateTimePicker dtpDate;

@@ -127,7 +127,9 @@ namespace JewelryTool
             btnPrintSetting.Click += BtnPrintSetting_Click;
             btnStats.Click += BtnStats_Click;
             btnAddCustomer.Click += BtnAddCustomer_Click;
+            btnDeleteCustomer.Click += BtnDeleteCustomer_Click; // 新增：删除客户
             btnAddProduct.Click += BtnAddProduct_Click;
+            btnDeleteProduct.Click += BtnDeleteProduct_Click; // 新增：删除品类
             btnHistory.Click += BtnHistory_Click;
 
             dgvItems.CellEndEdit += DgvItems_CellEndEdit;
@@ -228,6 +230,47 @@ namespace JewelryTool
             MessageBox.Show("客户添加成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
+        // 新增：删除客户
+        private void BtnDeleteCustomer_Click(object sender, EventArgs e)
+        {
+            var selectedCust = cbCustomer.SelectedItem as Customer;
+            if (selectedCust == null)
+            {
+                MessageBox.Show("请选择要删除的客户！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // 防护：禁止删除默认客户
+            if (selectedCust.Name == "零售客户" || selectedCust.Name == "合作门店")
+            {
+                MessageBox.Show("系统默认客户，禁止删除！", "禁止操作", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // 防护：检查客户是否被订单使用
+            bool isUsed = orders.Any(o => o.CustomerId == selectedCust.Id);
+            if (isUsed)
+            {
+                MessageBox.Show("该客户已存在单据，禁止删除！", "数据保护", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // 确认删除
+            if (MessageBox.Show($"确定删除客户：{selectedCust.Name}？", "确认删除", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                customers.Remove(selectedCust);
+                SaveCustomersToJson();
+
+                // 刷新下拉框
+                cbCustomer.DataSource = null;
+                cbCustomer.DataSource = customers;
+                cbCustomer.DisplayMember = "Name";
+                cbCustomer.ValueMember = "Id";
+
+                MessageBox.Show("客户删除成功！", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
         private void BtnAddProduct_Click(object sender, EventArgs e)
         {
             string prodName = Interaction.InputBox("请输入品类名称", "新增品类", "");
@@ -243,6 +286,73 @@ namespace JewelryTool
             colProduct.ValueMember = "Id";
 
             MessageBox.Show("品类添加成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        // 新增：删除品类
+        private void BtnDeleteProduct_Click(object sender, EventArgs e)
+        {
+            // 获取当前选中的品类（从表格下拉框）
+            if (colProduct.DataSource == null) return;
+            var productList = (List<Product>)colProduct.DataSource;
+            if (productList.Count == 0)
+            {
+                MessageBox.Show("暂无品类可删除！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // 弹出选择框，选择要删除的品类
+            using (Form selectForm = new Form())
+            {
+                selectForm.Text = "选择删除品类";
+                selectForm.Size = new Size(300, 150);
+                ComboBox cbo = new ComboBox() { Dock = DockStyle.Top, DataSource = productList, DisplayMember = "Name", ValueMember = "Id" };
+                Button btnOk = new Button() { Text = "确认删除", Dock = DockStyle.Bottom };
+                selectForm.Controls.Add(cbo);
+                selectForm.Controls.Add(btnOk);
+                selectForm.StartPosition = FormStartPosition.CenterParent;
+
+                btnOk.Click += (s, ev) =>
+                {
+                    var selectedProd = cbo.SelectedItem as Product;
+                    if (selectedProd == null) return;
+
+                    // 防护：禁止删除默认品类
+                    var defaultProducts = new[] { "黄金", "18k", "22k", "pt900", "pt950", "pt990", "pd990" };
+                    if (defaultProducts.Contains(selectedProd.Name))
+                    {
+                        MessageBox.Show("系统默认品类，禁止删除！", "禁止操作", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        selectForm.DialogResult = DialogResult.OK;
+                        return;
+                    }
+
+                    // 防护：检查品类是否被订单使用
+                    bool isUsed = orders.SelectMany(o => o.Items).Any(i => i.ProductId == selectedProd.Id);
+                    if (isUsed)
+                    {
+                        MessageBox.Show("该品类已存在单据，禁止删除！", "数据保护", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        selectForm.DialogResult = DialogResult.OK;
+                        return;
+                    }
+
+                    // 确认删除
+                    if (MessageBox.Show($"确定删除品类：{selectedProd.Name}？", "确认删除", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    {
+                        products.Remove(selectedProd);
+                        SaveProductsToJson();
+
+                        // 刷新表格下拉框
+                        colProduct.DataSource = null;
+                        colProduct.DataSource = products;
+                        colProduct.DisplayMember = "Name";
+                        colProduct.ValueMember = "Id";
+
+                        MessageBox.Show("品类删除成功！", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    selectForm.DialogResult = DialogResult.OK;
+                };
+
+                selectForm.ShowDialog();
+            }
         }
 
         private void BtnAddRow_Click(object sender, EventArgs e)
