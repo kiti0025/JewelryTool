@@ -20,12 +20,12 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.dgvProductStats = new System.Windows.Forms.DataGridView();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            // 新增：日期选择器
             this.dtpDate = new System.Windows.Forms.DateTimePicker();
             this.panelPriceStats = new System.Windows.Forms.Panel();
             this.lblSelectedStats = new System.Windows.Forms.Label();
             this.dgvPriceStats = new System.Windows.Forms.DataGridView();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.dtpDateDaily = new System.Windows.Forms.DateTimePicker();
             this.dgvDailyStats = new System.Windows.Forms.DataGridView();
             this.btnRefresh = new System.Windows.Forms.Button();
             this.btnExportStats = new System.Windows.Forms.Button();
@@ -88,7 +88,7 @@
             this.tabPage2.Text = "每百克阶梯均价";
             this.tabPage2.UseVisualStyleBackColor = true;
 
-            // dtpDate 【新增：日期选择器】
+            // dtpDate 【日期选择器】
             this.dtpDate.Dock = System.Windows.Forms.DockStyle.Top;
             this.dtpDate.Font = new System.Drawing.Font("微软雅黑", 9F);
             this.dtpDate.Location = new System.Drawing.Point(3, 3);
@@ -96,7 +96,6 @@
             this.dtpDate.Size = new System.Drawing.Size(1046, 27);
             this.dtpDate.TabIndex = 1;
             this.dtpDate.Value = new System.DateTime(2025, 11, 1, 0, 0, 0, 0);
-            // 绑定日期切换事件
             this.dtpDate.ValueChanged += new System.EventHandler(this.dtpDate_ValueChanged);
 
             // panelPriceStats
@@ -134,7 +133,6 @@
             this.dgvPriceStats.SelectionChanged += new System.EventHandler(this.DgvPriceStats_SelectionChanged);
 
             // tabPage3
-            this.tabPage3.Controls.Add(this.dgvDailyStats);
             this.tabPage3.Location = new System.Drawing.Point(4, 25);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
@@ -143,19 +141,33 @@
             this.tabPage3.Text = "每日出入库统计";
             this.tabPage3.UseVisualStyleBackColor = true;
 
+            // dtpDateDaily 【每日统计日期选择器】
+            this.dtpDateDaily.Dock = System.Windows.Forms.DockStyle.Top;
+            this.dtpDateDaily.Font = new System.Drawing.Font("微软雅黑", 9F);
+            this.dtpDateDaily.Location = new System.Drawing.Point(3, 3);
+            this.dtpDateDaily.Name = "dtpDateDaily";
+            this.dtpDateDaily.Size = new System.Drawing.Size(1046, 27);
+            this.dtpDateDaily.TabIndex = 1;
+            this.dtpDateDaily.Value = new System.DateTime(2025, 11, 1, 0, 0, 0, 0);
+            this.dtpDateDaily.ValueChanged += new System.EventHandler(this.dtpDateDaily_ValueChanged);
+
             // dgvDailyStats
             this.dgvDailyStats.AllowUserToAddRows = false;
             this.dgvDailyStats.AllowUserToDeleteRows = false;
             this.dgvDailyStats.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvDailyStats.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvDailyStats.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvDailyStats.Location = new System.Drawing.Point(3, 3);
+            this.dgvDailyStats.Location = new System.Drawing.Point(3, 30);
             this.dgvDailyStats.Name = "dgvDailyStats";
             this.dgvDailyStats.ReadOnly = true;
             this.dgvDailyStats.RowHeadersVisible = false;
             this.dgvDailyStats.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvDailyStats.Size = new System.Drawing.Size(1046, 485);
+            this.dgvDailyStats.Size = new System.Drawing.Size(1046, 458);
             this.dgvDailyStats.TabIndex = 0;
+
+            // tabPage3 控件添加顺序
+            this.tabPage3.Controls.Add(this.dgvDailyStats);
+            this.tabPage3.Controls.Add(this.dtpDateDaily);
 
             // btnRefresh
             this.btnRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -226,7 +238,7 @@
         private System.Windows.Forms.Button btnClose;
         private System.Windows.Forms.Panel panelPriceStats;
         private System.Windows.Forms.Label lblSelectedStats;
-        // 新增：日期选择器控件声明
         private System.Windows.Forms.DateTimePicker dtpDate;
+        private System.Windows.Forms.DateTimePicker dtpDateDaily;
     }
 }

@@ -26,8 +26,8 @@ namespace JewelryTool
 
         private void StatsForm_Load(object sender, EventArgs e)
         {
-            // 默认选中当日日期
             dtpDate.Value = DateTime.Now;
+            dtpDateDaily.Value = DateTime.Now;
             LoadAllData();
             CalculateAllStats();
         }
@@ -87,7 +87,6 @@ namespace JewelryTool
             }
         }
 
-        // 仅统计【当日】黄金每百克阶梯均价
         private void CalculatePriceStats()
         {
             var tiers = new List<dynamic>();
@@ -97,11 +96,9 @@ namespace JewelryTool
             }
             tiers.Add(new { Min = 5000m, Max = decimal.MaxValue, Name = "5000克以上" });
 
-            // 获取选中的统计日期
             DateTime targetDate = dtpDate.Value.Date;
 
             var stats = from tier in tiers
-                            // 核心：筛选 当日+入库+黄金
                         let inItems = orders.Where(o => o.OrderType == "入库" && o.OrderDate.Date == targetDate)
                                            .SelectMany(o => o.Items)
                                            .Where(x => x.ProductName == "黄金")
@@ -129,28 +126,31 @@ namespace JewelryTool
 
         private void CalculateDailyStats()
         {
-            var stats = from o in orders
-                        group o by o.OrderDate.Date into g
-                        orderby g.Key descending
-                        let dayInItems = g.Where(x => x.OrderType == "入库").SelectMany(x => x.Items)
-                        let dayOutItems = g.Where(x => x.OrderType == "出库").SelectMany(x => x.Items)
+            DateTime targetDate = dtpDateDaily.Value.Date;
+
+            var stats = from p in products
+                        join item in orders.Where(o => o.OrderDate.Date == targetDate).SelectMany(o => o.Items)
+                        on p.Id equals item.ProductId into items
+                        from item in items.DefaultIfEmpty()
+                        group item by p into g
                         select new
                         {
-                            日期 = g.Key.ToString("yyyy-MM-dd"),
-                            入库总重量 = dayInItems.Sum(x => x.NetWeight),
-                            入库总金额 = g.Where(x => x.OrderType == "入库").Sum(x => x.GrandTotal),
-                            当日入库每克均价 = dayInItems.Sum(x => x.TotalPrice) / (dayInItems.Sum(x => x.NetWeight) + 0.0001m),
-                            出库总重量 = dayOutItems.Sum(x => x.NetWeight),
-                            出库总金额 = g.Where(x => x.OrderType == "出库").Sum(x => x.GrandTotal),
-                            当日出库每克均价 = dayOutItems.Sum(x => x.TotalPrice) / (dayOutItems.Sum(x => x.NetWeight) + 0.0001m),
-                            当日净库存变化 = dayInItems.Sum(x => x.NetWeight) - dayOutItems.Sum(x => x.NetWeight)
+                            品类 = g.Key.Name,
+                            入库重量 = g.Where(x => x != null && orders.First(o => o.Items.Contains(x)).OrderType == "入库").Sum(x => x?.NetWeight ?? 0),
+                            出库重量 = g.Where(x => x != null && orders.First(o => o.Items.Contains(x)).OrderType == "出库").Sum(x => x?.NetWeight ?? 0),
+                            净库存变化 = g.Where(x => x != null && orders.First(o => o.Items.Contains(x)).OrderType == "入库").Sum(x => x?.NetWeight ?? 0)
+                                            - g.Where(x => x != null && orders.First(o => o.Items.Contains(x)).OrderType == "出库").Sum(x => x?.NetWeight ?? 0),
+                            入库总金额 = g.Where(x => x != null && orders.First(o => o.Items.Contains(x)).OrderType == "入库").Sum(x => x?.TotalPrice ?? 0),
+                            出库总金额 = g.Where(x => x != null && orders.First(o => o.Items.Contains(x)).OrderType == "出库").Sum(x => x?.TotalPrice ?? 0),
+                            当日入库每克均价 = g.Where(x => x != null && orders.First(o => o.Items.Contains(x)).OrderType == "入库").Sum(x => x?.StatisticTotalPrice ?? 0)
+                                                / (g.Where(x => x != null && orders.First(o => o.Items.Contains(x)).OrderType == "入库").Sum(x => x?.NetWeight ?? 0) + 0.0001m)
                         };
 
             dgvDailyStats.DataSource = stats.ToList();
 
             foreach (DataGridViewColumn col in dgvDailyStats.Columns)
             {
-                if (col.Name != "日期")
+                if (col.Name.Contains("重量") || col.Name.Contains("金额") || col.Name.Contains("均价"))
                 {
                     col.DefaultCellStyle.Format = "F4";
                 }
@@ -220,10 +220,14 @@ namespace JewelryTool
             lblSelectedStats.Text = $"已选 {dgvPriceStats.SelectedRows.Count} 项 | 总重量：{totalWeight:F2}g | 总金额：{totalAmount:F2}元 | 合并每百克均价：{avgPer100g:F2}元";
         }
 
-        // 日期切换 → 立即刷新统计
         private void dtpDate_ValueChanged(object sender, EventArgs e)
         {
             CalculatePriceStats();
+        }
+
+        private void dtpDateDaily_ValueChanged(object sender, EventArgs e)
+        {
+            CalculateDailyStats();
         }
 
         private void ExportGridViewToSheet(DataGridView dgv, ExcelWorksheet sheet)
