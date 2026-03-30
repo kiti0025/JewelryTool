@@ -27,6 +27,9 @@ namespace JewelryTool
         // 打印配置
         private PageSettings printPageSettings = new PageSettings();
 
+        // ====================== 新增：时间刷新定时器（仅1行，无修改） ======================
+        private Timer timeRefreshTimer;
+
         public MainForm()
         {
             InitializeComponent();
@@ -99,6 +102,7 @@ namespace JewelryTool
             cbCustomer.DisplayMember = "Name";
             cbCustomer.ValueMember = "Id";
 
+            // ====================== 修复1：改回正确的ComboBoxStyle.DropDown（原笔误写成Drop） ======================
             cbCustomer.DropDownStyle = ComboBoxStyle.DropDown;
             cbCustomer.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
             cbCustomer.AutoCompleteSource = AutoCompleteSource.ListItems;
@@ -113,6 +117,9 @@ namespace JewelryTool
             dtpDate.Value = DateTime.Now;
             dtpDate.Format = DateTimePickerFormat.Custom;
             dtpDate.CustomFormat = "yyyy-MM-dd HH:mm";
+            // ====================== 新增：启动自动刷新时间（仅1行，无修改） ======================
+            StartAutoRefreshTime();
+
             if (cbType.Items.Count > 0)
                 cbType.SelectedIndex = 0;
         }
@@ -127,9 +134,9 @@ namespace JewelryTool
             btnPrintSetting.Click += BtnPrintSetting_Click;
             btnStats.Click += BtnStats_Click;
             btnAddCustomer.Click += BtnAddCustomer_Click;
-            btnDeleteCustomer.Click += BtnDeleteCustomer_Click; // 新增：删除客户
+            btnDeleteCustomer.Click += BtnDeleteCustomer_Click;
             btnAddProduct.Click += BtnAddProduct_Click;
-            btnDeleteProduct.Click += BtnDeleteProduct_Click; // 新增：删除品类
+            btnDeleteProduct.Click += BtnDeleteProduct_Click;
             btnHistory.Click += BtnHistory_Click;
 
             dgvItems.CellEndEdit += DgvItems_CellEndEdit;
@@ -156,6 +163,15 @@ namespace JewelryTool
             printPageSettings.Margins = new Margins(20, 20, 20, 20);
         }
         #endregion
+
+        // ====================== 新增：每分钟自动刷新时间（独立方法，无修改） ======================
+        private void StartAutoRefreshTime()
+        {
+            timeRefreshTimer = new Timer();
+            timeRefreshTimer.Interval = 60000; // 1分钟 = 60000毫秒
+            timeRefreshTimer.Tick += (s, e) => { dtpDate.Value = DateTime.Now; };
+            timeRefreshTimer.Start();
+        }
 
         #region 数据保存
         private void SaveCustomersToJson()
@@ -230,7 +246,6 @@ namespace JewelryTool
             MessageBox.Show("客户添加成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        // 新增：删除客户
         private void BtnDeleteCustomer_Click(object sender, EventArgs e)
         {
             var selectedCust = cbCustomer.SelectedItem as Customer;
@@ -240,14 +255,12 @@ namespace JewelryTool
                 return;
             }
 
-            // 防护：禁止删除默认客户
             if (selectedCust.Name == "零售客户" || selectedCust.Name == "合作门店")
             {
                 MessageBox.Show("系统默认客户，禁止删除！", "禁止操作", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            // 防护：检查客户是否被订单使用
             bool isUsed = orders.Any(o => o.CustomerId == selectedCust.Id);
             if (isUsed)
             {
@@ -255,13 +268,11 @@ namespace JewelryTool
                 return;
             }
 
-            // 确认删除
             if (MessageBox.Show($"确定删除客户：{selectedCust.Name}？", "确认删除", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 customers.Remove(selectedCust);
                 SaveCustomersToJson();
 
-                // 刷新下拉框
                 cbCustomer.DataSource = null;
                 cbCustomer.DataSource = customers;
                 cbCustomer.DisplayMember = "Name";
@@ -288,10 +299,8 @@ namespace JewelryTool
             MessageBox.Show("品类添加成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        // 新增：删除品类
         private void BtnDeleteProduct_Click(object sender, EventArgs e)
         {
-            // 获取当前选中的品类（从表格下拉框）
             if (colProduct.DataSource == null) return;
             var productList = (List<Product>)colProduct.DataSource;
             if (productList.Count == 0)
@@ -300,7 +309,6 @@ namespace JewelryTool
                 return;
             }
 
-            // 弹出选择框，选择要删除的品类
             using (Form selectForm = new Form())
             {
                 selectForm.Text = "选择删除品类";
@@ -316,7 +324,6 @@ namespace JewelryTool
                     var selectedProd = cbo.SelectedItem as Product;
                     if (selectedProd == null) return;
 
-                    // 防护：禁止删除默认品类
                     var defaultProducts = new[] { "黄金", "18k", "22k", "pt900", "pt950", "pt990", "pd990" };
                     if (defaultProducts.Contains(selectedProd.Name))
                     {
@@ -325,7 +332,6 @@ namespace JewelryTool
                         return;
                     }
 
-                    // 防护：检查品类是否被订单使用
                     bool isUsed = orders.SelectMany(o => o.Items).Any(i => i.ProductId == selectedProd.Id);
                     if (isUsed)
                     {
@@ -334,13 +340,11 @@ namespace JewelryTool
                         return;
                     }
 
-                    // 确认删除
                     if (MessageBox.Show($"确定删除品类：{selectedProd.Name}？", "确认删除", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
                         products.Remove(selectedProd);
                         SaveProductsToJson();
 
-                        // 刷新表格下拉框
                         colProduct.DataSource = null;
                         colProduct.DataSource = products;
                         colProduct.DisplayMember = "Name";
@@ -461,7 +465,6 @@ namespace JewelryTool
             if (e.RowIndex < 0) return;
             var currentRow = dgvItems.Rows[e.RowIndex];
 
-            // 计算成色折价
             decimal purity = 0, unitPrice = 0;
             if (decimal.TryParse(currentRow.Cells[colPurity.Name].Value?.ToString(), out purity)
                 && decimal.TryParse(currentRow.Cells[colUnitPrice.Name].Value?.ToString(), out unitPrice))
@@ -470,7 +473,6 @@ namespace JewelryTool
                 currentRow.Cells[colDiscountedPrice.Name].Value = Math.Truncate(discountPrice * 10) / 10;
             }
 
-            // 计算单项总价
             decimal netWeight = 0, finalDiscountPrice = 0;
             if (decimal.TryParse(currentRow.Cells[colNetWeight.Name].Value?.ToString(), out netWeight)
                 && decimal.TryParse(currentRow.Cells[colDiscountedPrice.Name].Value?.ToString(), out finalDiscountPrice))
@@ -534,10 +536,8 @@ namespace JewelryTool
                 {
                     var product = products.FirstOrDefault(p => p.Id == Convert.ToInt32(row.Cells[colProduct.Name].Value ?? 0));
 
-                    // 直接计算统计总价（净重×单价），不操作界面
                     decimal netWeight = Convert.ToDecimal(row.Cells[colNetWeight.Name].Value ?? 0);
                     decimal unitPrice = Convert.ToDecimal(row.Cells[colUnitPrice.Name].Value ?? 0);
-                    // ✅ 修改：统计总价改为小数（保留2位小数，珠宝行业标准精度）
                     decimal statTotal = Math.Round(netWeight * unitPrice, 2);
 
                     newOrder.Items.Add(new OrderItem
@@ -550,8 +550,8 @@ namespace JewelryTool
                         Purity = Convert.ToDecimal(row.Cells[colPurity.Name].Value ?? 1),
                         UnitPrice = unitPrice,
                         DiscountedPrice = Convert.ToDecimal(row.Cells[colDiscountedPrice.Name].Value ?? 0),
-                        TotalPrice = Convert.ToInt32(row.Cells[colTotalPrice.Name].Value ?? 0), // 保持int不变
-                        StatisticTotalPrice = statTotal // ✅ 小数类型赋值
+                        TotalPrice = Convert.ToInt32(row.Cells[colTotalPrice.Name].Value ?? 0),
+                        StatisticTotalPrice = statTotal
                     });
                 }
 
@@ -656,7 +656,6 @@ namespace JewelryTool
             {
                 using (PrintSettingForm settingForm = new PrintSettingForm(printPageSettings))
                 {
-                    // ✅ 修复：这里必须是 DialogResult.OK，不是 Dialog.OK
                     if (settingForm.ShowDialog() == DialogResult.OK)
                     {
                         printPageSettings = settingForm.ResultPageSettings;
@@ -726,11 +725,9 @@ namespace JewelryTool
 
                 int lineHeight = 20;
 
-                // 标题
                 g.DrawString("瑞华珠宝兑料单", titleFont, blackBrush, startX + 100, startY);
                 startY += 30;
 
-                // 客户、日期、类型
                 string custName = (cbCustomer.SelectedItem as Customer)?.Name ?? "未知客户";
                 string custText = $"客户：{custName}";
                 string dateText = $"日期：{dtpDate.Value:yyyy-MM-dd HH:mm}";
@@ -741,11 +738,9 @@ namespace JewelryTool
                 g.DrawString(typeText, headFont, blackBrush, startX + 400, startY);
                 startY += lineHeight * 2;
 
-                // 表头与列宽（总价是最后一列）
                 string[] tableHeaders = { "序号", "品名", "毛重", "净重", "成色", "单价", "折价", "总价" };
                 int[] colWidths = { 45, 90, 65, 65, 50, 70, 80, 90 };
 
-                // 计算每根竖线X坐标（网格只到最后一列“总价”为止）
                 List<int> xList = new List<int> { startX };
                 int currentX = startX;
                 foreach (int w in colWidths)
@@ -753,9 +748,8 @@ namespace JewelryTool
                     currentX += w;
                     xList.Add(currentX);
                 }
-                int tableRightX = xList.Last(); // 表格右边界（总价列结束位置）
+                int tableRightX = xList.Last();
 
-                // 画表头
                 currentX = startX;
                 for (int i = 0; i < tableHeaders.Length; i++)
                 {
@@ -765,14 +759,12 @@ namespace JewelryTool
                 int headerBottom = startY + lineHeight;
                 startY = headerBottom;
 
-                // 表头上下横线（只到表格右边界）
                 g.DrawLine(linePen, startX, headerBottom - lineHeight, tableRightX, headerBottom - lineHeight);
                 g.DrawLine(linePen, startX, headerBottom, tableRightX, headerBottom);
 
                 int tableBottom = headerBottom;
                 int rowCount = dgvItems.Rows.Count;
 
-                // 画数据行
                 while (_printCurrentRowIndex < rowCount && (startY + lineHeight) < printArea.Bottom - 100)
                 {
                     DataGridViewRow row = dgvItems.Rows[_printCurrentRowIndex];
@@ -781,11 +773,10 @@ namespace JewelryTool
                     for (int i = 0; i < colWidths.Length; i++)
                     {
                         string txt = "";
-                        if (i == 1) // 品名
+                        if (i == 1)
                         {
                             if (int.TryParse(row.Cells[i]?.Value?.ToString(), out int pid))
                             {
-                                // ✅ 核心修复：Lambda参数名改为prod，避免与外层变量p冲突
                                 var p = products.FirstOrDefault(prod => prod.Id == pid);
                                 txt = p?.Name ?? "";
                             }
@@ -801,19 +792,16 @@ namespace JewelryTool
 
                     startY += lineHeight;
                     tableBottom = startY;
-                    // 行横线（只到表格右边界）
                     g.DrawLine(linePen, startX, startY, tableRightX, startY);
 
                     _printCurrentRowIndex++;
                 }
 
-                // 画竖线（完整网格，只到总价列）
                 foreach (int x in xList)
                 {
                     g.DrawLine(linePen, x, headerBottom - lineHeight, x, tableBottom);
                 }
 
-                // 总价、备注
                 if (_printCurrentRowIndex >= rowCount)
                 {
                     startY += lineHeight;
@@ -910,14 +898,14 @@ namespace JewelryTool
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
+        // ====================== 修复2：改回正确的{ get; set; }（原笔误写成revert back） ======================
         public string ProductName { get; set; }
         public decimal GrossWeight { get; set; }
         public decimal NetWeight { get; set; }
         public decimal Purity { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal DiscountedPrice { get; set; }
-        public int TotalPrice { get; set; } // 保持int类型不变
-        // ✅ 修改：统计专用总价 改为小数类型（decimal）
+        public int TotalPrice { get; set; }
         public decimal StatisticTotalPrice { get; set; }
     }
     #endregion

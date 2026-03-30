@@ -140,5 +140,28 @@
         "StatisticTotalPrice": 0.0
       }
     ]
+  },
+  {
+    "Id": 3,
+    "CustomerId": 1,
+    "CustomerName": "零售客户",
+    "OrderDate": "2026-03-30T10:10:33.1483321+08:00",
+    "OrderType": "入库",
+    "GrandTotal": 80,
+    "Remarks": "",
+    "Items": [
+      {
+        "Id": 1,
+        "ProductId": 1,
+        "ProductName": "黄金",
+        "GrossWeight": 10.0,
+        "NetWeight": 10.0,
+        "Purity": 0.8,
+        "UnitPrice": 10.0,
+        "DiscountedPrice": 8.0,
+        "TotalPrice": 80,
+        "StatisticTotalPrice": 100.0
+      }
+    ]
   }
 ]
